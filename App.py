@@ -24,12 +24,12 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS กำหนดกรอบล้อมรอบอย่างถูกต้อง ป้องกันกล่องหลุดลอย
+# Custom CSS กำหนดโครงสร้างกรอบล้อมรอบอย่างถูกต้อง 100% ป้องกันกล่องหลุดลอย
 st.markdown("""
     <style>
     .stApp { background-color: #0A0E1A; color: #E2E8F0; }
     
-    /* กรอบการ์ดสำหรับฝั่งซ้าย (ราคาหุ้น & Stats) */
+    /* กรอบฝั่งซ้าย (ราคาหุ้น & Stats) */
     .left-panel-card {
         background-color: #101625;
         border: 1px solid #1E293B;
@@ -47,14 +47,12 @@ st.markdown("""
         margin-bottom: 20px;
     }
     
-    /* กรอบใหญ่ครอบ AI Summary ฝั่งขวา (Right Outer Panel) */
-    .right-outer-panel {
-        background-color: #101625;
-        border: 1px solid #1E293B;
-        border-radius: 12px;
-        padding: 20px;
-        margin-bottom: 20px;
-        text-align: center;
+    /* Grid Layout สำหรับ 6 โมดูลย่อยภายในกรอบกลาง */
+    .modules-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-top: 15px;
     }
     
     /* 6 โมดูลย่อยภายในกรอบกลาง */
@@ -63,20 +61,19 @@ st.markdown("""
         border: 1px solid #232D42;
         border-radius: 10px;
         padding: 14px 10px;
-        margin-bottom: 12px;
         text-align: center;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: space-between;
-        min-height: 230px;
+        min-height: 220px;
     }
     
     /* Donut Ring CSS */
     .donut-container {
         position: relative;
-        width: 72px;
-        height: 72px;
+        width: 70px;
+        height: 70px;
         margin: 6px auto;
     }
     
@@ -90,8 +87,8 @@ st.markdown("""
     }
     
     .donut-inner {
-        width: 54px;
-        height: 54px;
+        width: 52px;
+        height: 52px;
         background-color: #172033;
         border-radius: 50%;
         display: flex;
@@ -103,7 +100,7 @@ st.markdown("""
     .donut-score { font-size: 16px; font-weight: bold; color: #FFFFFF; line-height: 1; }
     .donut-sub { font-size: 9px; color: #64748B; margin-top: 1px; }
     
-    /* Badges */
+    /* Badges Style */
     .badge-excellent { background-color: rgba(16, 185, 129, 0.12); color: #10B981; border: 1px solid #10B981; padding: 3px 10px; border-radius: 15px; font-weight: bold; font-size: 10px; margin-top: 4px; }
     .badge-good { background-color: rgba(59, 130, 246, 0.12); color: #3B82F6; border: 1px solid #3B82F6; padding: 3px 10px; border-radius: 15px; font-weight: bold; font-size: 10px; margin-top: 4px; }
     .badge-warn { background-color: rgba(245, 158, 11, 0.12); color: #F59E0B; border: 1px solid #F59E0B; padding: 3px 10px; border-radius: 15px; font-weight: bold; font-size: 10px; margin-top: 4px; }
@@ -126,7 +123,7 @@ def render_stars(score_100):
     stars = max(1, min(5, stars))
     return "★" * stars + "☆" * (5 - stars)
 
-def render_html_module_card(num, title, score, color_hex, badge_text, badge_class, desc_text):
+def get_module_card_html(num, title, score, color_hex, badge_text, badge_class, desc_text):
     stars = render_stars(score)
     score_deg = int((score / 100) * 360)
     
@@ -404,36 +401,34 @@ if "Overview" in selected_tab:
             </div>
         """, unsafe_allow_html=True)
 
-    # --- MIDDLE COLUMN: สั่งเรนเดอร์กรอบใหญ่ล้อมรอบกลุ่มโมดูลย่อย ---
+    # --- MIDDLE COLUMN: สั่งเรนเดอร์ Pure HTML Block ครอบ 6 โมดูลสมบูรณ์แบบ 100% ---
     with col_mid:
-        st.markdown("<div class='middle-outer-panel'>", unsafe_allow_html=True)
-        st.markdown("<h5 style='margin-bottom:15px; color:white;'>INVESTMENT DECISION OVERVIEW</h5>", unsafe_allow_html=True)
+        mos_class = "badge-excellent" if calc['mos_pct'] > 0 else "badge-danger"
+        mos_label = "UNDERVALUED" if calc['mos_pct'] > 0 else "OVERVALUED"
         
-        m_row1_col1, m_row1_col2, m_row1_col3 = st.columns(3)
-        with m_row1_col1:
-            st.markdown(render_html_module_card("01", "COMPANY HEALTH", calc["m1_score"], "#10B981", "EXCELLENT", "badge-excellent", "Strong financial health & sustainable quality"), unsafe_allow_html=True)
-            
-        with m_row1_col2:
-            mos_class = "badge-excellent" if calc['mos_pct'] > 0 else "badge-danger"
-            mos_label = "UNDERVALUED" if calc['mos_pct'] > 0 else "OVERVALUED"
-            st.markdown(render_html_module_card("02", "FAIR VALUE", calc["m2_score"], "#F59E0B", mos_label, mos_class, f"Attractive valuation (MoS {calc['mos_pct']:+.1f}%)"), unsafe_allow_html=True)
+        c1_html = get_module_card_html("01", "COMPANY HEALTH", calc["m1_score"], "#10B981", "EXCELLENT", "badge-excellent", "Strong financial health & sustainable quality")
+        c2_html = get_module_card_html("02", "FAIR VALUE", calc["m2_score"], "#F59E0B", mos_label, mos_class, f"Attractive valuation (MoS {calc['mos_pct']:+.1f}%)")
+        c3_html = get_module_card_html("03", "ENTRY TIMING", calc["m3_score"], "#3B82F6", "NEUTRAL", "badge-good", "Wait for better entry point based on technicals")
+        c4_html = get_module_card_html("04", "AI PREDICTION", calc["m4_score"], "#8B5CF6", "POSITIVE", "badge-good", "AI forecasts positive price movement in 6-12m")
+        c5_html = get_module_card_html("05", "RISK ANALYSIS", calc["m5_score"], "#F97316", "MODERATE", "badge-warn", "Moderate risk level with key factors to monitor")
+        c6_html = get_module_card_html("06", "BENCHMARK", calc["m6_score"], "#06B6D4", "OUTPERFORM", "badge-excellent", "Outperforming industry average across metrics")
+        
+        middle_html = f"""
+            <div class='middle-outer-panel'>
+                <h5 style='margin-bottom:15px; color:white;'>INVESTMENT DECISION OVERVIEW</h5>
+                <div class='modules-grid'>
+                    {c1_html}
+                    {c2_html}
+                    {c3_html}
+                    {c4_html}
+                    {c5_html}
+                    {c6_html}
+                </div>
+            </div>
+        """
+        st.markdown(middle_html, unsafe_allow_html=True)
 
-        with m_row1_col3:
-            st.markdown(render_html_module_card("03", "ENTRY TIMING", calc["m3_score"], "#3B82F6", "NEUTRAL", "badge-good", "Wait for better entry point based on technicals"), unsafe_allow_html=True)
-
-        m_row2_col1, m_row2_col2, m_row2_col3 = st.columns(3)
-        with m_row2_col1:
-            st.markdown(render_html_module_card("04", "AI PREDICTION", calc["m4_score"], "#8B5CF6", "POSITIVE", "badge-good", "AI forecasts positive price movement in 6-12m"), unsafe_allow_html=True)
-
-        with m_row2_col2:
-            st.markdown(render_html_module_card("05", "RISK ANALYSIS", calc["m5_score"], "#F97316", "MODERATE", "badge-warn", "Moderate risk level with key factors to monitor"), unsafe_allow_html=True)
-
-        with m_row2_col3:
-            st.markdown(render_html_module_card("06", "BENCHMARK", calc["m6_score"], "#06B6D4", "OUTPERFORM", "badge-excellent", "Outperforming industry average across metrics"), unsafe_allow_html=True)
-
-        st.markdown("</div>", unsafe_allow_html=True)
-
-    # --- RIGHT COLUMN: สั่งเรนเดอร์กรอบใหญ่ล้อมรอบ AI Summary ---
+    # --- RIGHT COLUMN: สั่งเรนเดอร์ AI Summary ฝั่งขวา ---
     with col_right:
         st.markdown("<div class='right-outer-panel'>", unsafe_allow_html=True)
         st.markdown("<h5 style='margin-bottom:15px; color:white;'>AI INVESTMENT SUMMARY</h5>", unsafe_allow_html=True)
@@ -479,7 +474,7 @@ elif "Company Health" in selected_tab:
     
     col1, col2 = st.columns([4, 8])
     with col1:
-        st.markdown(render_html_module_card("01", "OVERALL HEALTH SCORE", calc["m1_score"], "#10B981", f"SCORE {calc['m1_score']}", "badge-excellent", "Strong financial health"), unsafe_allow_html=True)
+        st.markdown(get_module_card_html("01", "OVERALL HEALTH SCORE", calc["m1_score"], "#10B981", f"SCORE {calc['m1_score']}", "badge-excellent", "Strong financial health"), unsafe_allow_html=True)
 
     with col2:
         st.markdown("<div class='left-panel-card'>", unsafe_allow_html=True)
@@ -491,7 +486,7 @@ elif "Company Health" in selected_tab:
     dim_cols = st.columns(7)
     for idx, dim in enumerate(calc["m1_dims"]):
         with dim_cols[idx]:
-            st.markdown(render_html_module_card(f"0{idx+1}", dim["name"], round(dim["score"]), "#10B981", f"W: {dim['w']}", "badge-excellent", ""), unsafe_allow_html=True)
+            st.markdown(get_module_card_html(f"0{idx+1}", dim["name"], round(dim["score"]), "#10B981", f"W: {dim['w']}", "badge-excellent", ""), unsafe_allow_html=True)
 
     st.divider()
     st.markdown("##### 📋 FINANCIAL STATEMENT HISTORY & RATIOS")
