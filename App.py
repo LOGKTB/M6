@@ -24,20 +24,24 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS สำหรับคุมกรอบ Card ให้คลุมสวยงามเหมือนรูปที่ 2
+# Custom CSS สำหรับสร้าง Pure HTML Donut Ring และบังคับให้ Card คลุมทั้งใบ
 st.markdown("""
     <style>
     .stApp { background-color: #0B0F19; color: #E2E8F0; }
     
-    /* Card Container Style - คลุมองค์ประกอบทั้งหมด */
+    /* กรอบการ์ดสี่เหลี่ยม - คลุมองค์ประกอบทั้งหมดในใบเดียว */
     .module-card {
         background-color: #111827;
         border: 1px solid #1F2937;
         border-radius: 12px;
-        padding: 16px;
-        margin-bottom: 12px;
+        padding: 16px 12px;
+        margin-bottom: 16px;
         text-align: center;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
     }
     
     .dashboard-card {
@@ -48,13 +52,45 @@ st.markdown("""
         margin-bottom: 16px;
     }
     
-    .badge-excellent { background-color: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid #10B981; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 11px; display: inline-block; margin-top: 6px; }
-    .badge-good { background-color: rgba(59, 130, 246, 0.15); color: #3B82F6; border: 1px solid #3B82F6; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 11px; display: inline-block; margin-top: 6px; }
-    .badge-warn { background-color: rgba(245, 158, 11, 0.15); color: #F59E0B; border: 1px solid #F59E0B; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 11px; display: inline-block; margin-top: 6px; }
-    .badge-danger { background-color: rgba(239, 68, 68, 0.15); color: #EF4444; border: 1px solid #EF4444; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 11px; display: inline-block; margin-top: 6px; }
+    /* Pure CSS Circular Donut Ring */
+    .donut-container {
+        position: relative;
+        width: 80px;
+        height: 80px;
+        margin: 12px auto;
+    }
     
-    .star-rating { font-size: 16px; color: #F59E0B; letter-spacing: 2px; margin-top: 4px; }
-    .card-title { font-size: 12px; font-weight: bold; color: #94A3B8; letter-spacing: 0.5px; }
+    .donut-ring {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .donut-inner {
+        width: 62px;
+        height: 62px;
+        background-color: #111827;
+        border-radius: 50%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .donut-score { font-size: 18px; font-weight: bold; color: #FFFFFF; line-height: 1; }
+    .donut-sub { font-size: 9px; color: #94A3B8; margin-top: 2px; }
+    
+    /* Badges Style */
+    .badge-excellent { background-color: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid #10B981; padding: 4px 10px; border-radius: 20px; font-weight: bold; font-size: 11px; display: inline-block; margin-top: 8px; }
+    .badge-good { background-color: rgba(59, 130, 246, 0.15); color: #3B82F6; border: 1px solid #3B82F6; padding: 4px 10px; border-radius: 20px; font-weight: bold; font-size: 11px; display: inline-block; margin-top: 8px; }
+    .badge-warn { background-color: rgba(245, 158, 11, 0.15); color: #F59E0B; border: 1px solid #F59E0B; padding: 4px 10px; border-radius: 20px; font-weight: bold; font-size: 11px; display: inline-block; margin-top: 8px; }
+    .badge-danger { background-color: rgba(239, 68, 68, 0.15); color: #EF4444; border: 1px solid #EF4444; padding: 4px 10px; border-radius: 20px; font-weight: bold; font-size: 11px; display: inline-block; margin-top: 8px; }
+    
+    .star-rating { font-size: 15px; color: #F59E0B; letter-spacing: 2px; margin-top: 4px; }
+    .card-title { font-size: 11px; font-weight: bold; color: #94A3B8; letter-spacing: 0.5px; }
     .metric-value { font-size: 20px; font-weight: bold; color: #FFFFFF; }
     .metric-label { font-size: 11px; color: #64748B; }
     </style>
@@ -68,27 +104,27 @@ def render_stars(score_100):
     stars = max(1, min(5, stars))
     return "★" * stars + "☆" * (5 - stars)
 
-def create_donut_ring(score, color="#10B981", height=110):
-    fig = go.Figure(data=[go.Pie(
-        labels=['Score', 'Remaining'],
-        values=[score, max(100 - score, 0)],
-        hole=0.75,
-        marker_colors=[color, "#1F2937"],
-        textinfo='none',
-        hoverinfo='none'
-    )])
-    fig.update_layout(
-        showlegend=False,
-        margin=dict(t=2, b=2, l=2, r=2),
-        height=height,
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
-        annotations=[dict(
-            text=f"<b style='font-size:18px;color:white;'>{score:.0f}</b><br><span style='font-size:9px;color:#94A3B8;'>/100</span>",
-            x=0.5, y=0.5, showarrow=False
-        )]
-    )
-    return fig
+# ฟังก์ชันเรนเดอร์การ์ดทั้งใบเป็น Pure HTML 100% (กรอบคลุมทุกอย่าง)
+def render_html_module_card(title, score, color_hex, badge_text, badge_class):
+    stars = render_stars(score)
+    score_deg = int((score / 100) * 360)
+    
+    html_code = f"""
+        <div class='module-card'>
+            <div class='card-title'>{title}</div>
+            <div class='donut-container'>
+                <div class='donut-ring' style='background: conic-gradient({color_hex} 0deg {score_deg}deg, #1F2937 {score_deg}deg 360deg);'>
+                    <div class='donut-inner'>
+                        <span class='donut-score'>{score:.0f}</span>
+                        <span class='donut-sub'>/100</span>
+                    </div>
+                </div>
+            </div>
+            <div class='star-rating'>{stars}</div>
+            <div class='{badge_class}'>{badge_text}</div>
+        </div>
+    """
+    return html_code
 
 def create_gauge_meter(score):
     fig = go.Figure(go.Indicator(
@@ -234,24 +270,6 @@ def calculate_stock_metrics(stock_data):
         "rec_text": rec_text
     }
 
-# Helper สำหรับสร้าง Card คลุมสวยงามแบบรูปที่ 2
-def render_module_card(title, score, color, badge_text, badge_class):
-    fig = create_donut_ring(score, color=color)
-    stars = render_stars(score)
-    
-    st.markdown(f"""
-        <div class='module-card'>
-            <div class='card-title'>{title}</div>
-    """, unsafe_allow_html=True)
-    
-    st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
-    
-    st.markdown(f"""
-            <div class='star-rating'>{stars}</div>
-            <div class='{badge_class}'>{badge_text}</div>
-        </div>
-    """, unsafe_allow_html=True)
-
 # ==========================================
 # 5. SIDEBAR & APP CONTROLS
 # ==========================================
@@ -331,30 +349,30 @@ if "Overview" in selected_tab:
             </div>
         """, unsafe_allow_html=True)
 
-    # --- MIDDLE COLUMN: 6 Modules Grid (การ์ดคลุมองค์ประกอบทั้งหมด) ---
+    # --- MIDDLE COLUMN: 6 Modules Grid (แสดงผลด้วย Pure HTML การ์ดคลุมทั้งใบ 100%) ---
     with col_mid:
         st.markdown("##### INVESTMENT DECISION OVERVIEW")
         
         m_row1_col1, m_row1_col2, m_row1_col3 = st.columns(3)
         with m_row1_col1:
-            render_module_card("01 COMPANY HEALTH", calc["m1_score"], "#10B981", f"SCORE {calc['m1_score']}", "badge-excellent")
+            st.markdown(render_html_module_card("01 COMPANY HEALTH", calc["m1_score"], "#10B981", f"SCORE {calc['m1_score']}", "badge-excellent"), unsafe_allow_html=True)
             
         with m_row1_col2:
             mos_class = "badge-excellent" if calc['mos_pct'] > 0 else "badge-danger"
-            render_module_card("02 FAIR VALUE", calc["m2_score"], "#F59E0B", f"MoS {calc['mos_pct']:+.1f}%", mos_class)
+            st.markdown(render_html_module_card("02 FAIR VALUE", calc["m2_score"], "#F59E0B", f"MoS {calc['mos_pct']:+.1f}%", mos_class), unsafe_allow_html=True)
 
         with m_row1_col3:
-            render_module_card("03 ENTRY TIMING", calc["m3_score"], "#3B82F6", "NEUTRAL", "badge-good")
+            st.markdown(render_html_module_card("03 ENTRY TIMING", calc["m3_score"], "#3B82F6", "NEUTRAL", "badge-good"), unsafe_allow_html=True)
 
         m_row2_col1, m_row2_col2, m_row2_col3 = st.columns(3)
         with m_row2_col1:
-            render_module_card("04 AI PREDICTION", calc["m4_score"], "#8B5CF6", "POSITIVE", "badge-good")
+            st.markdown(render_html_module_card("04 AI PREDICTION", calc["m4_score"], "#8B5CF6", "POSITIVE", "badge-good"), unsafe_allow_html=True)
 
         with m_row2_col2:
-            render_module_card("05 RISK ANALYSIS", calc["m5_score"], "#F97316", "MODERATE", "badge-warn")
+            st.markdown(render_html_module_card("05 RISK ANALYSIS", calc["m5_score"], "#F97316", "MODERATE", "badge-warn"), unsafe_allow_html=True)
 
         with m_row2_col3:
-            render_module_card("06 BENCHMARK", calc["m6_score"], "#06B6D4", "OUTPERFORM", "badge-excellent")
+            st.markdown(render_html_module_card("06 BENCHMARK", calc["m6_score"], "#06B6D4", "OUTPERFORM", "badge-excellent"), unsafe_allow_html=True)
 
     # --- RIGHT COLUMN ---
     with col_right:
@@ -395,11 +413,7 @@ elif "Company Health" in selected_tab:
     
     col1, col2 = st.columns([4, 8])
     with col1:
-        st.markdown("<div class='dashboard-card' style='text-align:center;'>", unsafe_allow_html=True)
-        st.plotly_chart(create_donut_ring(calc["m1_score"], color="#10B981", height=130), use_container_width=True, config={'displayModeBar': False})
-        st.markdown(f"<div class='star-rating'>{render_stars(calc['m1_score'])}</div>", unsafe_allow_html=True)
-        st.markdown(f"### SCORE {calc['m1_score']} / 100")
-        st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown(render_html_module_card("OVERALL HEALTH SCORE", calc["m1_score"], "#10B981", f"SCORE {calc['m1_score']}", "badge-excellent"), unsafe_allow_html=True)
 
     with col2:
         st.markdown("<div class='dashboard-card'>", unsafe_allow_html=True)
@@ -411,7 +425,7 @@ elif "Company Health" in selected_tab:
     dim_cols = st.columns(7)
     for idx, dim in enumerate(calc["m1_dims"]):
         with dim_cols[idx]:
-            render_module_card(dim["name"], round(dim["score"]), "#10B981", f"W: {dim['w']}", "badge-excellent")
+            st.markdown(render_html_module_card(dim["name"], round(dim["score"]), "#10B981", f"W: {dim['w']}", "badge-excellent"), unsafe_allow_html=True)
 
     st.divider()
     st.markdown("##### 📋 FINANCIAL STATEMENT HISTORY & RATIOS")
