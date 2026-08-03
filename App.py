@@ -1,8 +1,18 @@
+import sys
+import subprocess
+
+# สั่งติดตั้ง plotly อัตโนมัติหากระบบยังไม่มี
+try:
+    import plotly.graph_objects as go
+    import plotly.express as px
+except ModuleNotFoundError:
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "plotly"])
+    import plotly.graph_objects as go
+    import plotly.express as px
+
 import streamlit as st
 import pandas as pd
 import numpy as np
-import plotly.graph_objects as go
-import plotly.express as px
 
 # ==========================================
 # 1. SYSTEM CONFIGURATION & STYLING
@@ -148,7 +158,6 @@ if view_mode == "🌐 Overview (8 Stocks)":
     st.markdown("<div class='main-header'>🌐 Executive Overview: 8 Target Stocks Analysis</div>", unsafe_allow_html=True)
     st.markdown("<div class='sub-header'>Synthesized decision results across Module 1 - 6 (KOS 1.0 Framework)</div>", unsafe_allow_html=True)
     
-    # Leaderboard Table
     summary_list = []
     for s in stock_list:
         d = db[s]
@@ -169,7 +178,6 @@ if view_mode == "🌐 Overview (8 Stocks)":
     
     df_summary = pd.DataFrame(summary_list)
     
-    # KPI Row
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("Total Stocks Analyzed", "8 Stocks")
     col2.metric("Top CIS Score", "DELTA (81 / Grade A)")
@@ -183,7 +191,6 @@ if view_mode == "🌐 Overview (8 Stocks)":
     
     st.divider()
     
-    # Visualizing 2x2 Strategic Position Matrix (KO-37)
     st.subheader("📌 Strategic Position Matrix (KO-37: Fundamental vs Valuation)")
     
     fig_matrix = px.scatter(
@@ -204,7 +211,7 @@ if view_mode == "🌐 Overview (8 Stocks)":
     fig_matrix.add_hline(y=0, line_dash="dash", line_color="gray")
     fig_matrix.add_vline(x=70, line_dash="dash", line_color="gray")
     
-    fig_matrix.update_traces(textposition='top center', font=dict(size=14, family="Arial Black"))
+    fig_matrix.update_traces(textposition='top center', textfont=dict(size=14, family="Arial Black"))
     fig_matrix.update_layout(
         xaxis_title="Fundamental Health Score (X-Axis)",
         yaxis_title="Margin of Safety % (Y-Axis)",
@@ -223,7 +230,6 @@ else:
     st.markdown(f"<div class='main-header'>🔍 Deep-Dive Analysis: {s}</div>", unsafe_allow_html=True)
     st.markdown(f"<div class='sub-header'>Full Knowledge Object Evaluation (KO-01 to KO-40) | Market Price: {d['m2']['price']:.2f} THB</div>", unsafe_allow_html=True)
     
-    # Hero Card Section
     hcol1, hcol2, hcol3, hcol4, hcol5 = st.columns(5)
     hcol1.metric("CIS Score (KO-38)", f"{d['m6']['cis_score']}/100", d['m6']['grade'])
     hcol2.metric("Fair Value (KO-11)", f"{d['m2']['fair_value']:.2f} THB", f"{d['m2']['mos']:+.1f}% MoS")
@@ -270,7 +276,7 @@ else:
             st.markdown(f"<b>💡 Explainable Reasoning (XAI Engine - Module 1):</b><br>", unsafe_allow_html=True)
             st.markdown(f"* <b>KO-01 (ROE):</b> ROE อยู่ที่ {m1['roe']}% ซึ่ง {'สูงกว่า' if m1['roe'] > 15 else 'ต่ำกว่า'} เกณฑ์อุตสาหกรรม")
             st.markdown(f"* <b>KO-02 (NPM):</b> อัตรากำไรสุทธิอยู่ที่ {m1['npm']}% สะท้อน Pricing Power")
-            st.markdown(f"* <b>KO-06 (D/E Ratio):</b> หหนี้สินต่อทุนอยู่ที่ {m1['de']} เท่า {'อยู่ในระดับปลอดภัย' if m1['de'] < 1.5 else 'เสี่ยงสูง'}")
+            st.markdown(f"* <b>KO-06 (D/E Ratio):</b> หนี้สินต่อทุนอยู่ที่ {m1['de']} เท่า {'อยู่ในระดับปลอดภัย' if m1['de'] < 1.5 else 'เสี่ยงสูง'}")
             st.markdown(f"* <b>KO-07 (Cash Flow Quality):</b> OCF/NI = {m1['ocf_ni']} เท่า {'กำไรมีคุณภาพเป็นเงินสดจริง' if m1['ocf_ni'] >= 1.0 else 'ระวัง Accrual Items'}")
             st.markdown("</div>", unsafe_allow_html=True)
 
