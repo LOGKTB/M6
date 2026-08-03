@@ -24,40 +24,42 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS สำหรับสร้าง Pure HTML Donut Ring และบังคับให้ Card คลุมทั้งใบ
+# Custom CSS เพื่อเก็บรายละเอียดกรอบล้อมรอบทุกจุด
 st.markdown("""
     <style>
-    .stApp { background-color: #0B0F19; color: #E2E8F0; }
+    .stApp { background-color: #0A0E1A; color: #E2E8F0; }
     
-    /* กรอบการ์ดสี่เหลี่ยม - คลุมองค์ประกอบทั้งหมดในใบเดียว */
-    .module-card {
-        background-color: #111827;
-        border: 1px solid #1F2937;
+    /* Outer Large Card Container (กรอบใหญ่ครอบกลุ่ม) */
+    .outer-card {
+        background-color: #101625;
+        border: 1px solid #1E293B;
         border-radius: 12px;
-        padding: 16px 12px;
-        margin-bottom: 16px;
+        padding: 20px;
+        margin-bottom: 20px;
+        height: 100%;
+    }
+    
+    /* Inner Module Card (กรอบย่อย 6 โมดูล) */
+    .module-card-inner {
+        background-color: #172033;
+        border: 1px solid #232D42;
+        border-radius: 10px;
+        padding: 14px 10px;
+        margin-bottom: 12px;
         text-align: center;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
+        justify-content: space-between;
+        min-height: 240px;
     }
     
-    .dashboard-card {
-        background-color: #111827;
-        border: 1px solid #1F2937;
-        border-radius: 12px;
-        padding: 16px;
-        margin-bottom: 16px;
-    }
-    
-    /* Pure CSS Circular Donut Ring */
+    /* Pure CSS Donut Ring */
     .donut-container {
         position: relative;
-        width: 80px;
-        height: 80px;
-        margin: 12px auto;
+        width: 76px;
+        height: 76px;
+        margin: 6px auto;
     }
     
     .donut-ring {
@@ -70,9 +72,9 @@ st.markdown("""
     }
     
     .donut-inner {
-        width: 62px;
-        height: 62px;
-        background-color: #111827;
+        width: 58px;
+        height: 58px;
+        background-color: #172033;
         border-radius: 50%;
         display: flex;
         flex-direction: column;
@@ -80,18 +82,20 @@ st.markdown("""
         justify-content: center;
     }
     
-    .donut-score { font-size: 18px; font-weight: bold; color: #FFFFFF; line-height: 1; }
-    .donut-sub { font-size: 9px; color: #94A3B8; margin-top: 2px; }
+    .donut-score { font-size: 17px; font-weight: bold; color: #FFFFFF; line-height: 1; }
+    .donut-sub { font-size: 9px; color: #64748B; margin-top: 1px; }
     
     /* Badges Style */
-    .badge-excellent { background-color: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid #10B981; padding: 4px 10px; border-radius: 20px; font-weight: bold; font-size: 11px; display: inline-block; margin-top: 8px; }
-    .badge-good { background-color: rgba(59, 130, 246, 0.15); color: #3B82F6; border: 1px solid #3B82F6; padding: 4px 10px; border-radius: 20px; font-weight: bold; font-size: 11px; display: inline-block; margin-top: 8px; }
-    .badge-warn { background-color: rgba(245, 158, 11, 0.15); color: #F59E0B; border: 1px solid #F59E0B; padding: 4px 10px; border-radius: 20px; font-weight: bold; font-size: 11px; display: inline-block; margin-top: 8px; }
-    .badge-danger { background-color: rgba(239, 68, 68, 0.15); color: #EF4444; border: 1px solid #EF4444; padding: 4px 10px; border-radius: 20px; font-weight: bold; font-size: 11px; display: inline-block; margin-top: 8px; }
+    .badge-excellent { background-color: rgba(16, 185, 129, 0.12); color: #10B981; border: 1px solid #10B981; padding: 3px 10px; border-radius: 15px; font-weight: bold; font-size: 10px; margin-top: 4px; }
+    .badge-good { background-color: rgba(59, 130, 246, 0.12); color: #3B82F6; border: 1px solid #3B82F6; padding: 3px 10px; border-radius: 15px; font-weight: bold; font-size: 10px; margin-top: 4px; }
+    .badge-warn { background-color: rgba(245, 158, 11, 0.12); color: #F59E0B; border: 1px solid #F59E0B; padding: 3px 10px; border-radius: 15px; font-weight: bold; font-size: 10px; margin-top: 4px; }
+    .badge-danger { background-color: rgba(239, 68, 68, 0.12); color: #EF4444; border: 1px solid #EF4444; padding: 3px 10px; border-radius: 15px; font-weight: bold; font-size: 10px; margin-top: 4px; }
     
-    .star-rating { font-size: 15px; color: #F59E0B; letter-spacing: 2px; margin-top: 4px; }
-    .card-title { font-size: 11px; font-weight: bold; color: #94A3B8; letter-spacing: 0.5px; }
-    .metric-value { font-size: 20px; font-weight: bold; color: #FFFFFF; }
+    .star-rating { font-size: 14px; color: #F59E0B; letter-spacing: 1px; margin-top: 2px; }
+    .card-title { font-size: 11px; font-weight: 700; color: #94A3B8; letter-spacing: 0.5px; text-transform: uppercase; }
+    .card-desc { font-size: 10px; color: #64748B; margin-top: 6px; line-height: 1.2; padding: 0 4px; }
+    
+    .metric-value { font-size: 18px; font-weight: bold; color: #FFFFFF; }
     .metric-label { font-size: 11px; color: #64748B; }
     </style>
 """, unsafe_allow_html=True)
@@ -104,16 +108,15 @@ def render_stars(score_100):
     stars = max(1, min(5, stars))
     return "★" * stars + "☆" * (5 - stars)
 
-# ฟังก์ชันเรนเดอร์การ์ดทั้งใบเป็น Pure HTML 100% (กรอบคลุมทุกอย่าง)
-def render_html_module_card(title, score, color_hex, badge_text, badge_class):
+def render_html_module_card(num, title, score, color_hex, badge_text, badge_class, desc_text):
     stars = render_stars(score)
     score_deg = int((score / 100) * 360)
     
-    html_code = f"""
-        <div class='module-card'>
-            <div class='card-title'>{title}</div>
+    return f"""
+        <div class='module-card-inner'>
+            <div class='card-title'>{num} {title}</div>
             <div class='donut-container'>
-                <div class='donut-ring' style='background: conic-gradient({color_hex} 0deg {score_deg}deg, #1F2937 {score_deg}deg 360deg);'>
+                <div class='donut-ring' style='background: conic-gradient({color_hex} 0deg {score_deg}deg, #2A364F {score_deg}deg 360deg);'>
                     <div class='donut-inner'>
                         <span class='donut-score'>{score:.0f}</span>
                         <span class='donut-sub'>/100</span>
@@ -122,28 +125,59 @@ def render_html_module_card(title, score, color_hex, badge_text, badge_class):
             </div>
             <div class='star-rating'>{stars}</div>
             <div class='{badge_class}'>{badge_text}</div>
+            <div class='card-desc'>{desc_text}</div>
         </div>
     """
-    return html_code
 
 def create_gauge_meter(score):
     fig = go.Figure(go.Indicator(
         mode="gauge+number",
         value=score,
-        number={'suffix': "/100", 'font': {'size': 26, 'color': 'white'}},
+        number={'suffix': "/100", 'font': {'size': 28, 'color': 'white'}},
         gauge={
             'axis': {'range': [0, 100], 'tickwidth': 0, 'showticklabels': False},
             'bar': {'color': "#10B981" if score>=75 else ("#F59E0B" if score>=55 else "#EF4444")},
-            'bgcolor': "#1F2937",
+            'bgcolor': "#1E293B",
             'bordercolor': "rgba(0,0,0,0)"
         }
     ))
-    fig.update_layout(height=150, margin=dict(t=20, b=0, l=15, r=15), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+    fig.update_layout(height=140, margin=dict(t=20, b=0, l=15, r=15), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
     return fig
 
-def create_mini_sparkline(trend_data, color="#10B981"):
-    fig = go.Figure(data=go.Scatter(y=trend_data, mode='lines', fill='tozeroy', line=dict(color=color, width=2)))
-    fig.update_layout(height=80, margin=dict(t=0, b=0, l=0, r=0), xaxis=dict(visible=False), yaxis=dict(visible=False), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+# 📈 กราฟราคาพร้อมแกน X แกน Y ตามรูปต้นแบบ
+def create_stock_price_chart(dates, prices, color="#10B981"):
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(
+        x=dates,
+        y=prices,
+        mode='lines',
+        line=dict(color=color, width=2),
+        fill='tozeroy',
+        fillcolor='rgba(16, 185, 129, 0.1)'
+    ))
+    
+    fig.update_layout(
+        height=140,
+        margin=dict(t=10, b=20, l=10, r=35),
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        xaxis=dict(
+            showgrid=False,
+            showline=False,
+            zeroline=False,
+            tickfont=dict(size=9, color='#64748B'),
+            nticks=4
+        ),
+        yaxis=dict(
+            side='right',
+            showgrid=True,
+            gridcolor='#1E293B',
+            showline=False,
+            zeroline=False,
+            tickfont=dict(size=9, color='#64748B'),
+            nticks=3
+        )
+    )
     return fig
 
 # ==========================================
@@ -153,51 +187,53 @@ stock_list = ["ADVANC", "CCET", "DELTA", "HANA", "JMART", "KCE", "TRUE", "THCOM"
 
 @st.cache_data
 def get_raw_financial_db():
+    dates = ["May 2024", "Jul 2024", "Sep 2024", "Nov 2024", "Jan 2025", "Mar 2025", "May 2025"]
     return {
         "ADVANC": {
             "name": "Advanced Info Service PCL", "price": 285.00, "mcap": "847,700 MB", "pe": 25.4, "pb": 8.2, "div": 3.85, "sector": "Technology", "industry": "Telecommunication", "eps": 11.22,
-            "prices_hist": [240, 250, 265, 275, 280, 285],
+            "dates": dates, "prices_hist": [240, 248, 255, 268, 275, 282, 285],
             "financials": {"ROE": 28.5, "ROA": 14.2, "NPM": 22.1, "DE": 1.25, "CR": 0.95, "OCF_NI": 1.25, "RevGrowth": 6.2, "NetGrowth": 9.5, "FCF": "42,100 MB", "Rank": "TOP 2"},
             "history_table": pd.DataFrame({"Metric": ["ROE (%)", "ROA (%)", "Net Profit Margin (%)", "Debt to Equity (x)", "Current Ratio (x)", "OCF / Net Income (x)"], "2023": [24.1, 12.1, 19.5, 1.45, 0.82, 1.15], "2024": [26.2, 13.2, 20.8, 1.32, 0.88, 1.20], "2025 Q1": [28.5, 14.2, 22.1, 1.25, 0.95, 1.25], "Status": ["Excellent", "Excellent", "Excellent", "Good", "Moderate", "Excellent"]})
         },
         "DELTA": {
             "name": "Delta Electronics (Thailand) PCL", "price": 160.00, "mcap": "1,996,000 MB", "pe": 65.3, "pb": 18.2, "div": 0.85, "sector": "Technology", "industry": "Electronic Components", "eps": 2.45,
-            "prices_hist": [115, 130, 145, 150, 155, 160],
+            "dates": dates, "prices_hist": [115, 125, 138, 145, 150, 158, 160],
             "financials": {"ROE": 32.1, "ROA": 21.5, "NPM": 16.8, "DE": 0.42, "CR": 1.85, "OCF_NI": 1.12, "RevGrowth": 22.0, "NetGrowth": 28.4, "FCF": "18,500 MB", "Rank": "TOP 1"},
             "history_table": pd.DataFrame({"Metric": ["ROE (%)", "ROA (%)", "Net Profit Margin (%)", "Debt to Equity (x)", "Current Ratio (x)", "OCF / Net Income (x)"], "2023": [26.2, 18.2, 14.1, 0.55, 1.65, 1.05], "2024": [29.5, 19.8, 15.5, 0.48, 1.75, 1.10], "2025 Q1": [32.1, 21.5, 16.8, 0.42, 1.85, 1.12], "Status": ["Excellent", "Excellent", "Excellent", "Excellent", "Excellent", "Excellent"]})
         },
         "CCET": {
             "name": "Cal-Comp Electronics (Thailand) PCL", "price": 4.20, "mcap": "43,800 MB", "pe": 12.0, "pb": 1.65, "div": 2.80, "sector": "Technology", "industry": "Electronic Components", "eps": 0.35,
-            "prices_hist": [2.8, 3.1, 3.5, 3.8, 4.0, 4.2],
+            "dates": dates, "prices_hist": [2.8, 3.0, 3.3, 3.6, 3.8, 4.0, 4.2],
             "financials": {"ROE": 14.2, "ROA": 6.1, "NPM": 4.5, "DE": 1.65, "CR": 1.15, "OCF_NI": 0.95, "RevGrowth": 18.5, "NetGrowth": 25.0, "FCF": "2,400 MB", "Rank": "TOP 4"},
             "history_table": pd.DataFrame({"Metric": ["ROE (%)", "ROA (%)", "Net Profit Margin (%)", "Debt to Equity (x)", "Current Ratio (x)", "OCF / Net Income (x)"], "2023": [10.5, 4.2, 3.2, 1.85, 1.02, 0.82], "2024": [12.8, 5.1, 3.8, 1.72, 1.08, 0.88], "2025 Q1": [14.2, 6.1, 4.5, 1.65, 1.15, 0.95], "Status": ["Good", "Moderate", "Moderate", "Moderate", "Good", "Moderate"]})
         },
         "HANA": {
             "name": "Hana Microelectronics PCL", "price": 38.50, "mcap": "30,900 MB", "pe": 17.9, "pb": 1.25, "div": 4.20, "sector": "Technology", "industry": "Electronic Components", "eps": 2.15,
-            "prices_hist": [45, 42, 40, 39, 38, 38.5],
+            "dates": dates, "prices_hist": [45, 43, 41, 40, 39, 38, 38.5],
             "financials": {"ROE": 11.2, "ROA": 7.5, "NPM": 8.2, "DE": 0.35, "CR": 2.15, "OCF_NI": 1.35, "RevGrowth": -2.5, "NetGrowth": -8.4, "FCF": "3,100 MB", "Rank": "TOP 5"},
             "history_table": pd.DataFrame({"Metric": ["ROE (%)", "ROA (%)", "Net Profit Margin (%)", "Debt to Equity (x)", "Current Ratio (x)", "OCF / Net Income (x)"], "2023": [14.5, 9.2, 10.1, 0.42, 2.05, 1.20], "2024": [12.1, 8.0, 8.9, 0.38, 2.10, 1.28], "2025 Q1": [11.2, 7.5, 8.2, 0.35, 2.15, 1.35], "Status": ["Moderate", "Good", "Good", "Excellent", "Excellent", "Excellent"]})
         },
         "JMART": {
             "name": "Jaymart Group Holdings PCL", "price": 14.20, "mcap": "20,700 MB", "pe": 24.5, "pb": 1.85, "div": 1.50, "sector": "Commerce", "industry": "Technology Retail", "eps": 0.58,
-            "prices_hist": [22, 19, 17, 15, 14, 14.2],
+            "dates": dates, "prices_hist": [22, 20, 18, 16, 15, 14, 14.2],
             "financials": {"ROE": 7.8, "ROA": 3.8, "NPM": 4.1, "DE": 2.15, "CR": 1.05, "OCF_NI": 0.82, "RevGrowth": 4.2, "NetGrowth": 12.1, "FCF": "850 MB", "Rank": "TOP 7"},
             "history_table": pd.DataFrame({"Metric": ["ROE (%)", "ROA (%)", "Net Profit Margin (%)", "Debt to Equity (x)", "Current Ratio (x)", "OCF / Net Income (x)"], "2023": [-5.2, -2.1, -3.5, 2.45, 0.92, 0.65], "2024": [5.1, 2.5, 2.8, 2.25, 0.98, 0.75], "2025 Q1": [7.8, 3.8, 4.1, 2.15, 1.05, 0.82], "Status": ["Weak", "Weak", "Weak", "Weak", "Moderate", "Weak"]})
         },
         "KCE": {
             "name": "KCE Electronics PCL", "price": 41.00, "mcap": "48,400 MB", "pe": 19.3, "pb": 2.85, "div": 3.40, "sector": "Technology", "industry": "Electronic Components", "eps": 2.12,
-            "prices_hist": [52, 48, 45, 42, 40, 41],
+            "dates": dates, "prices_hist": [52, 49, 46, 44, 42, 40, 41],
             "financials": {"ROE": 15.8, "ROA": 10.2, "NPM": 11.5, "DE": 0.58, "CR": 1.75, "OCF_NI": 1.18, "RevGrowth": 3.5, "NetGrowth": 5.2, "FCF": "4,200 MB", "Rank": "TOP 3"},
             "history_table": pd.DataFrame({"Metric": ["ROE (%)", "ROA (%)", "Net Profit Margin (%)", "Debt to Equity (x)", "Current Ratio (x)", "OCF / Net Income (x)"], "2023": [18.2, 11.8, 12.8, 0.68, 1.55, 1.08], "2024": [16.5, 10.8, 11.9, 0.62, 1.65, 1.12], "2025 Q1": [15.8, 10.2, 11.5, 0.58, 1.75, 1.18], "Status": ["Good", "Good", "Good", "Excellent", "Excellent", "Good"]})
         },
         "TRUE": {
             "name": "True Corporation PCL", "price": 11.80, "mcap": "407,700 MB", "pe": 53.6, "pb": 3.12, "div": 1.20, "sector": "Technology", "industry": "Telecommunication", "eps": 0.22,
-            "prices_hist": [6.5, 7.8, 9.2, 10.5, 11.2, 11.8],
+            "dates": dates, "prices_hist": [6.5, 7.5, 8.8, 9.8, 10.5, 11.2, 11.8],
             "financials": {"ROE": 4.2, "ROA": 1.8, "NPM": 2.1, "DE": 3.85, "CR": 0.62, "OCF_NI": 2.85, "RevGrowth": 5.1, "NetGrowth": 110.0, "FCF": "18,200 MB", "Rank": "TOP 6"},
             "history_table": pd.DataFrame({"Metric": ["ROE (%)", "ROA (%)", "Net Profit Margin (%)", "Debt to Equity (x)", "Current Ratio (x)", "OCF / Net Income (x)"], "2023": [-8.5, -2.8, -5.2, 4.50, 0.51, 2.10], "2024": [1.2, 0.5, 0.8, 4.10, 0.58, 2.50], "2025 Q1": [4.2, 1.8, 2.1, 3.85, 0.62, 2.85], "Status": ["Weak", "Weak", "Weak", "Weak", "Weak", "Excellent"]})
         },
         "THCOM": {
-            "name": "Thaicom PCL", "price": 12.50, "mcap": "13,700 MB", "pe": 27.7, "pb": 0.92, "div": 2.40, "sector": "Technology", "industry": "Telecommunication", "eps": 0.45, "prices_hist": [14.5, 13.8, 13.0, 12.2, 12.1, 12.5],
+            "name": "Thaicom PCL", "price": 12.50, "mcap": "13,700 MB", "pe": 27.7, "pb": 0.92, "div": 2.40, "sector": "Technology", "industry": "Telecommunication", "eps": 0.45,
+            "dates": dates, "prices_hist": [14.5, 14.0, 13.5, 12.8, 12.2, 12.1, 12.5],
             "financials": {"ROE": 5.8, "ROA": 4.1, "NPM": 6.2, "DE": 0.28, "CR": 2.85, "OCF_NI": 1.45, "RevGrowth": -1.2, "NetGrowth": 15.2, "FCF": "1,250 MB", "Rank": "TOP 8"},
             "history_table": pd.DataFrame({"Metric": ["ROE (%)", "ROA (%)", "Net Profit Margin (%)", "Debt to Equity (x)", "Current Ratio (x)", "OCF / Net Income (x)"], "2023": [4.2, 2.8, 4.5, 0.35, 2.50, 1.25], "2024": [5.1, 3.5, 5.2, 0.31, 2.70, 1.35], "2025 Q1": [5.8, 4.1, 6.2, 0.28, 2.85, 1.45], "Status": ["Weak", "Moderate", "Moderate", "Excellent", "Excellent", "Excellent"]})
         }
@@ -241,16 +277,16 @@ def calculate_stock_metrics(stock_data):
     overall_score = (m1_score * 0.35) + (m2_score * 0.35) + (m4_score * 0.15) + (m5_score * 0.15)
     
     if overall_score >= 80 and mos_pct > 10:
-        rec = "STRONG BUY"
-        rec_text = "VERY ATTRACTIVE"
+        rec = "BUY"
+        rec_text = "ATTRACTIVE"
     elif overall_score >= 65 and mos_pct > 0:
-        rec = "BUY / ACCUMULATE"
+        rec = "ACCUMULATE"
         rec_text = "ATTRACTIVE"
     elif overall_score >= 50:
         rec = "HOLD"
         rec_text = "NEUTRAL"
     else:
-        rec = "AVOID / SELL"
+        rec = "SELL / AVOID"
         rec_text = "UNATTRACTIVE"
         
     return {
@@ -298,7 +334,7 @@ calc = calculate_stock_metrics(stock_raw)
 
 # Header Bar
 st.markdown(f"""
-    <div style='display: flex; justify-content: space-between; align-items: center; background-color: #111827; padding: 12px 20px; border-radius: 10px; border: 1px solid #1F2937; margin-bottom: 20px;'>
+    <div style='display: flex; justify-content: space-between; align-items: center; background-color: #101625; padding: 12px 20px; border-radius: 10px; border: 1px solid #1E293B; margin-bottom: 20px;'>
         <div>
             <span style='font-size:22px; font-weight:bold; color:white;'>{selected_symbol}</span>
             <span style='color:#94A3B8; font-size:14px; margin-left:10px;'>({stock_raw['name']})</span>
@@ -317,28 +353,30 @@ if "Overview" in selected_tab:
     st.markdown("## OVERVIEW DASHBOARD")
     st.caption("AI-Powered Investment Decision Support System")
     
-    col_left, col_mid, col_right = st.columns([3, 5, 3])
+    col_left, col_mid, col_right = st.columns([3.2, 5.6, 3.2])
     
     # --- LEFT COLUMN ---
     with col_left:
         st.markdown(f"""
-            <div class='dashboard-card'>
+            <div class='outer-card'>
                 <div style='font-size:20px; font-weight:bold; color:white;'>{selected_symbol} ☆</div>
-                <div style='font-size:12px; color:#94A3B8;'>{stock_raw['name']}</div>
-                <div style='font-size:28px; font-weight:bold; color:white; margin-top:10px;'>{stock_raw['price']:.2f} <span style='font-size:14px;'>THB</span></div>
-            </div>
+                <div style='font-size:12px; color:#94A3B8; margin-bottom:12px;'>{stock_raw['name']}</div>
+                <div style='font-size:28px; font-weight:bold; color:white;'>{stock_raw['price']:.2f} <span style='font-size:14px;'>THB</span></div>
+                <div style='color:#10B981; font-size:12px;'>+2.00 (+1.40%) ▲</div>
+                <div style='font-size:10px; color:#64748B; margin-top:2px; margin-bottom:10px;'>Market Closed | 23 May 2025</div>
         """, unsafe_allow_html=True)
         
-        fig_spark = create_mini_sparkline(stock_raw["prices_hist"])
-        st.plotly_chart(fig_spark, use_container_width=True, config={'displayModeBar': False})
+        # 📈 กราฟราคาหุ้นแสดงแกน X แกน Y สวยงาม
+        fig_stock = create_stock_price_chart(stock_raw["dates"], stock_raw["prices_hist"])
+        st.plotly_chart(fig_stock, use_container_width=True, config={'displayModeBar': False})
         
         st.markdown(f"""
-            <div class='dashboard-card'>
-                <div style='display:flex; justify-content:space-between; margin-bottom:8px;'>
+                <hr style='border-color:#1E293B; margin:15px 0;'>
+                <div style='display:flex; justify-content:space-between; margin-bottom:10px;'>
                     <div><div class='metric-label'>Market Cap</div><div class='metric-value' style='font-size:13px;'>{stock_raw['mcap']}</div></div>
                     <div><div class='metric-label'>P/E (TTM)</div><div class='metric-value' style='font-size:13px;'>{stock_raw['pe']}x</div></div>
                 </div>
-                <div style='display:flex; justify-content:space-between; margin-bottom:8px;'>
+                <div style='display:flex; justify-content:space-between; margin-bottom:10px;'>
                     <div><div class='metric-label'>Sector</div><div class='metric-value' style='font-size:13px;'>{stock_raw['sector']}</div></div>
                     <div><div class='metric-label'>P/B (TTM)</div><div class='metric-value' style='font-size:13px;'>{stock_raw['pb']}x</div></div>
                 </div>
@@ -349,42 +387,53 @@ if "Overview" in selected_tab:
             </div>
         """, unsafe_allow_html=True)
 
-    # --- MIDDLE COLUMN: 6 Modules Grid (แสดงผลด้วย Pure HTML การ์ดคลุมทั้งใบ 100%) ---
+    # --- MIDDLE COLUMN: Outer Card ใหญ่ล้อมรอบโมดูล 01-06 ---
     with col_mid:
-        st.markdown("##### INVESTMENT DECISION OVERVIEW")
+        st.markdown("<div class='outer-card'>", unsafe_allow_html=True)
+        st.markdown("<h5 style='margin-bottom:15px; color:white;'>INVESTMENT DECISION OVERVIEW</h5>", unsafe_allow_html=True)
         
         m_row1_col1, m_row1_col2, m_row1_col3 = st.columns(3)
         with m_row1_col1:
-            st.markdown(render_html_module_card("01 COMPANY HEALTH", calc["m1_score"], "#10B981", f"SCORE {calc['m1_score']}", "badge-excellent"), unsafe_allow_html=True)
+            st.markdown(render_html_module_card("01", "COMPANY HEALTH", calc["m1_score"], "#10B981", "EXCELLENT", "badge-excellent", "Strong financial health & sustainable quality"), unsafe_allow_html=True)
             
         with m_row1_col2:
             mos_class = "badge-excellent" if calc['mos_pct'] > 0 else "badge-danger"
-            st.markdown(render_html_module_card("02 FAIR VALUE", calc["m2_score"], "#F59E0B", f"MoS {calc['mos_pct']:+.1f}%", mos_class), unsafe_allow_html=True)
+            mos_label = "UNDERVALUED" if calc['mos_pct'] > 0 else "OVERVALUED"
+            st.markdown(render_html_module_card("02", "FAIR VALUE", calc["m2_score"], "#F59E0B", mos_label, mos_class, f"Attractive valuation (MoS {calc['mos_pct']:+.1f}%)"), unsafe_allow_html=True)
 
         with m_row1_col3:
-            st.markdown(render_html_module_card("03 ENTRY TIMING", calc["m3_score"], "#3B82F6", "NEUTRAL", "badge-good"), unsafe_allow_html=True)
+            st.markdown(render_html_module_card("03", "ENTRY TIMING", calc["m3_score"], "#3B82F6", "NEUTRAL", "badge-good", "Wait for better entry point based on technicals"), unsafe_allow_html=True)
 
         m_row2_col1, m_row2_col2, m_row2_col3 = st.columns(3)
         with m_row2_col1:
-            st.markdown(render_html_module_card("04 AI PREDICTION", calc["m4_score"], "#8B5CF6", "POSITIVE", "badge-good"), unsafe_allow_html=True)
+            st.markdown(render_html_module_card("04", "AI PREDICTION", calc["m4_score"], "#8B5CF6", "POSITIVE", "badge-good", "AI forecasts positive price movement in 6-12m"), unsafe_allow_html=True)
 
         with m_row2_col2:
-            st.markdown(render_html_module_card("05 RISK ANALYSIS", calc["m5_score"], "#F97316", "MODERATE", "badge-warn"), unsafe_allow_html=True)
+            st.markdown(render_html_module_card("05", "RISK ANALYSIS", calc["m5_score"], "#F97316", "MODERATE", "badge-warn", "Moderate risk level with key factors to monitor"), unsafe_allow_html=True)
 
         with m_row2_col3:
-            st.markdown(render_html_module_card("06 BENCHMARK", calc["m6_score"], "#06B6D4", "OUTPERFORM", "badge-excellent"), unsafe_allow_html=True)
+            st.markdown(render_html_module_card("06", "BENCHMARK", calc["m6_score"], "#06B6D4", "OUTPERFORM", "badge-excellent", "Outperforming industry average across metrics"), unsafe_allow_html=True)
 
-    # --- RIGHT COLUMN ---
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    # --- RIGHT COLUMN: Outer Card ใหญ่ล้อมรอบ AI Summary ---
     with col_right:
-        st.markdown("<div class='dashboard-card' style='text-align:center;'>", unsafe_allow_html=True)
-        st.markdown("##### AI INVESTMENT SUMMARY")
+        st.markdown("<div class='outer-card' style='text-align:center;'>", unsafe_allow_html=True)
+        st.markdown("<h5 style='margin-bottom:15px; color:white;'>AI INVESTMENT SUMMARY</h5>", unsafe_allow_html=True)
+        
         st.plotly_chart(create_gauge_meter(calc["overall_score"]), use_container_width=True, config={'displayModeBar': False})
-        st.markdown(f"<div class='star-rating' style='font-size:22px;'>{render_stars(calc['overall_score'])}</div>", unsafe_allow_html=True)
-        st.markdown(f"<h3 style='color:#10B981; margin:5px 0;'>{calc['rec_text']}</h3>", unsafe_allow_html=True)
-        st.caption(f"ประเมินจากตรรกะงบการเงินจริงของ {selected_symbol}")
+        
+        st.markdown(f"<div style='color:#94A3B8; font-size:10px; font-weight:bold; margin-top:-10px;'>OVERALL SCORE</div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='star-rating' style='font-size:20px;'>{render_stars(calc['overall_score'])}</div>", unsafe_allow_html=True)
+        st.markdown(f"<h3 style='color:#10B981; margin:8px 0;'>{calc['rec_text']}</h3>", unsafe_allow_html=True)
+        
+        st.markdown(f"<p style='font-size:11px; color:#94A3B8; line-height:1.4;'>{selected_symbol} shows attractive investment potential with strong fundamentals and solid AI predictions.</p>", unsafe_allow_html=True)
+        
         st.divider()
-        st.markdown("<div style='color:#94A3B8; font-size:11px;'>RECOMMENDATION VERDICT</div>", unsafe_allow_html=True)
-        st.markdown(f"<h2 style='color:#10B981; margin:0;'>🚀 {calc['rec']}</h2>", unsafe_allow_html=True)
+        st.markdown("<div style='color:#64748B; font-size:11px; font-weight:bold;'>RECOMMENDATION</div>", unsafe_allow_html=True)
+        st.markdown(f"<h2 style='color:#10B981; margin:5px 0;'>🚀 {calc['rec']}</h2>", unsafe_allow_html=True)
+        st.caption("Investment Horizon: LONG TERM (12+ Months)")
+        
         st.markdown("</div>", unsafe_allow_html=True)
 
     # --- BOTTOM ROW: HIGHLIGHT CARDS ---
@@ -393,17 +442,17 @@ if "Overview" in selected_tab:
     fin = stock_raw["financials"]
     
     with h_col1:
-        st.markdown(f"<div class='dashboard-card'>📈 <span class='metric-label'>Revenue Growth</span><div class='metric-value' style='color:#10B981;'>{fin['RevGrowth']:+.1f}%</div></div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='outer-card' style='padding:12px;'>📈 <span class='metric-label'>Revenue Growth</span><div class='metric-value' style='color:#10B981;'>{fin['RevGrowth']:+.1f}%</div><span class='metric-label'>YoY 2024</span></div>", unsafe_allow_html=True)
     with h_col2:
-        st.markdown(f"<div class='dashboard-card'>💰 <span class='metric-label'>Net Profit Growth</span><div class='metric-value' style='color:#10B981;'>{fin['NetGrowth']:+.1f}%</div></div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='outer-card' style='padding:12px;'>💰 <span class='metric-label'>Net Profit Growth</span><div class='metric-value' style='color:#10B981;'>{fin['NetGrowth']:+.1f}%</div><span class='metric-label'>YoY 2024</span></div>", unsafe_allow_html=True)
     with h_col3:
-        st.markdown(f"<div class='dashboard-card'>🔄 <span class='metric-label'>ROE (TTM)</span><div class='metric-value' style='color:#3B82F6;'>{fin['ROE']:.1f}%</div></div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='outer-card' style='padding:12px;'>🔄 <span class='metric-label'>ROE (TTM)</span><div class='metric-value' style='color:#3B82F6;'>{fin['ROE']:.1f}%</div><span class='metric-label'>High Efficiency</span></div>", unsafe_allow_html=True)
     with h_col4:
-        st.markdown(f"<div class='dashboard-card'>💵 <span class='metric-label'>Free Cash Flow</span><div class='metric-value' style='font-size:14px;'>{fin['FCF']}</div></div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='outer-card' style='padding:12px;'>💵 <span class='metric-label'>Free Cash Flow</span><div class='metric-value' style='font-size:14px;'>{fin['FCF']}</div><span class='metric-label'>Strong Cash Gen</span></div>", unsafe_allow_html=True)
     with h_col5:
-        st.markdown(f"<div class='dashboard-card'>🛡️ <span class='metric-label'>Debt to Equity</span><div class='metric-value' style='color:#F59E0B;'>{fin['DE']:.2f}x</div></div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='outer-card' style='padding:12px;'>🛡️ <span class='metric-label'>Debt to Equity</span><div class='metric-value' style='color:#F59E0B;'>{fin['DE']:.2f}x</div><span class='metric-label'>Low Risk</span></div>", unsafe_allow_html=True)
     with h_col6:
-        st.markdown(f"<div class='dashboard-card'>🏆 <span class='metric-label'>Industry Rank</span><div class='metric-value' style='color:#06B6D4;'>{fin['Rank']}</div></div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='outer-card' style='padding:12px;'>🏆 <span class='metric-label'>Industry Rank</span><div class='metric-value' style='color:#06B6D4;'>{fin['Rank']}</div><span class='metric-label'>In Sector</span></div>", unsafe_allow_html=True)
 
 # ==========================================
 # 7. TAB 2: COMPANY HEALTH
@@ -413,10 +462,10 @@ elif "Company Health" in selected_tab:
     
     col1, col2 = st.columns([4, 8])
     with col1:
-        st.markdown(render_html_module_card("OVERALL HEALTH SCORE", calc["m1_score"], "#10B981", f"SCORE {calc['m1_score']}", "badge-excellent"), unsafe_allow_html=True)
+        st.markdown(render_html_module_card("01", "OVERALL HEALTH SCORE", calc["m1_score"], "#10B981", f"SCORE {calc['m1_score']}", "badge-excellent", "Strong financial health"), unsafe_allow_html=True)
 
     with col2:
-        st.markdown("<div class='dashboard-card'>", unsafe_allow_html=True)
+        st.markdown("<div class='outer-card'>", unsafe_allow_html=True)
         st.markdown("##### 💡 EXPLAINABLE AI REASONING")
         st.write(f"จากการประมวลผลตรรกะ Rule-Based: บริษัท {selected_symbol} มีคะแนน ROE เท่ากับ {stock_raw['financials']['ROE']}% และมีภาระหนี้สิน D/E เท่ากับ {stock_raw['financials']['DE']}x ส่งผลให้ระดับเสถียรภาพทางการเงินอยู่ในเกณฑ์สอดคล้องกับมาตรฐาน KOS 1.0")
         st.markdown("</div>", unsafe_allow_html=True)
@@ -425,7 +474,7 @@ elif "Company Health" in selected_tab:
     dim_cols = st.columns(7)
     for idx, dim in enumerate(calc["m1_dims"]):
         with dim_cols[idx]:
-            st.markdown(render_html_module_card(dim["name"], round(dim["score"]), "#10B981", f"W: {dim['w']}", "badge-excellent"), unsafe_allow_html=True)
+            st.markdown(render_html_module_card(f"0{idx+1}", dim["name"], round(dim["score"]), "#10B981", f"W: {dim['w']}", "badge-excellent", ""), unsafe_allow_html=True)
 
     st.divider()
     st.markdown("##### 📋 FINANCIAL STATEMENT HISTORY & RATIOS")
