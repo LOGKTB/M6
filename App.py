@@ -108,4 +108,291 @@ def load_data():
         "THCOM": {
             "m1": {"roe": 5.8, "npm": 6.2, "roa": 4.1, "rev_growth": -1.2, "eps_growth": 15.2, "de": 0.28, "cr": 2.85, "ocf_ni": 1.45, "health_score": 72},
             "m2": {"price": 12.5, "eps": 0.45, "pe": 27.7, "pbv": 0.92, "ev_ebitda": 7.8, "dcf_base": 14.5, "dcf_bear": 12.0, "dcf_bull": 16.8, "rim_value": 13.8, "fair_value": 14.2, "mos": 11.97},
-            "m3": {"trend": "Sideways", "rsi": 48.5, "adx": 16.2, "stoch": "Neutral", "vol_trend": "Normal Volume", "support": 11.8, "resista
+            "m3": {"trend": "Sideways", "rsi": 48.5, "adx": 16.2, "stoch": "Neutral", "vol_trend": "Normal Volume", "support": 11.8, "resistance": 13.2, "signal": "Neutral"},
+            "m4": {"pred_7d": 12.6, "pred_30d": 13.2, "pred_90d": 14.1, "confidence": 80, "top_pos": ["P/BV (KO-09)", "Financial Stability (KO-06)"], "top_neg": ["ROE (KO-01)", "Revenue Growth (KO-04)"], "accuracy": 82.5},
+            "m5": {"beta": 0.85, "volatility": 24.5, "icr": 8.2, "var_95": -3.1, "sharpe": 0.35, "stress_impact": -11.2, "risk_score": 28, "risk_class": "Low Risk"},
+            "m6": {"percentile": 48, "quadrant": "Quality Compounder (Q1)", "cis_score": 66, "grade": "Grade B", "action": "ACCUMULATE", "sizing": "Equal Weight (5-8%)"}
+        }
+    }
+
+db = load_data()
+
+# ==========================================
+# 3. SIDEBAR NAVIGATION
+# ==========================================
+with st.sidebar:
+    st.title("🛡️ CIS Expert System")
+    st.caption("Investment Knowledge Base (IKB) KOS 1.0")
+    st.divider()
+    
+    view_mode = st.radio("📌 Select View Mode", ["🌐 Overview (8 Stocks)", "🔍 Single Stock Deep-Dive"])
+    st.divider()
+    
+    if view_mode == "🔍 Single Stock Deep-Dive":
+        selected_stock = st.selectbox("📌 Select Target Stock", stock_list)
+        selected_module = st.selectbox("🎯 Select Module (KO-01 to KO-40)", [
+            "Module 1: Company Health (KO-01 to KO-07)",
+            "Module 2: Fair Value (KO-08 to KO-14)",
+            "Module 3: Entry Timing (KO-15 to KO-21)",
+            "Module 4: AI Prediction (KO-22 to KO-27)",
+            "Module 5: Risk Analysis (KO-28 to KO-34)",
+            "Module 6: Strategic Matrix (KO-35 to KO-40)"
+        ])
+    else:
+        st.info("💡 Overview Mode displays composite metrics for all 8 target stocks.")
+
+# ==========================================
+# 4. VIEW MODE 1: OVERVIEW (8 STOCKS)
+# ==========================================
+if view_mode == "🌐 Overview (8 Stocks)":
+    st.markdown("<div class='main-header'>🌐 Executive Overview: 8 Target Stocks Analysis</div>", unsafe_allow_html=True)
+    st.markdown("<div class='sub-header'>Synthesized decision results across Module 1 - 6 (KOS 1.0 Framework)</div>", unsafe_allow_html=True)
+    
+    # Leaderboard Table
+    summary_list = []
+    for s in stock_list:
+        d = db[s]
+        summary_list.append({
+            "Stock Symbol": s,
+            "CIS Score (KO-38)": d["m6"]["cis_score"],
+            "Grade": d["m6"]["grade"],
+            "Health Score (M1)": d["m1"]["health_score"],
+            "Fair Value (KO-11)": f"{d['m2']['fair_value']:.2f}",
+            "Market Price": f"{d['m2']['price']:.2f}",
+            "Margin of Safety (KO-14)": f"{d['m2']['mos']:+.1f}%",
+            "Technical Signal (KO-21)": d["m3"]["signal"],
+            "Risk Class (KO-34)": d["m5"]["risk_class"],
+            "Strategic Quadrant (KO-37)": d["m6"]["quadrant"],
+            "Final Action (KO-39)": d["m6"]["action"],
+            "Position Size (KO-40)": d["m6"]["sizing"]
+        })
+    
+    df_summary = pd.DataFrame(summary_list)
+    
+    # KPI Row
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("Total Stocks Analyzed", "8 Stocks")
+    col2.metric("Top CIS Score", "DELTA (81 / Grade A)")
+    col3.metric("Highest MoS", "HANA (+12.5%)")
+    col4.metric("Lowest Risk", "ADVANC (Score 22/100)")
+    
+    st.divider()
+    
+    st.subheader("📋 CIS Benchmark Leaderboard")
+    st.dataframe(df_summary, use_container_width=True, hide_index=True)
+    
+    st.divider()
+    
+    # Visualizing 2x2 Strategic Position Matrix (KO-37)
+    st.subheader("📌 Strategic Position Matrix (KO-37: Fundamental vs Valuation)")
+    
+    fig_matrix = px.scatter(
+        df_summary,
+        x="Health Score (M1)",
+        y="Margin of Safety (KO-14)",
+        text="Stock Symbol",
+        color="Final Action (KO-39)",
+        size=[20]*8,
+        color_discrete_map={
+            "STRONG BUY": "#15803D",
+            "ACCUMULATE": "#0369A1",
+            "HOLD": "#B45309",
+            "SELL / AVOID": "#B91C1C"
+        }
+    )
+    
+    fig_matrix.add_hline(y=0, line_dash="dash", line_color="gray")
+    fig_matrix.add_vline(x=70, line_dash="dash", line_color="gray")
+    
+    fig_matrix.update_traces(textposition='top center', font=dict(size=14, family="Arial Black"))
+    fig_matrix.update_layout(
+        xaxis_title="Fundamental Health Score (X-Axis)",
+        yaxis_title="Margin of Safety % (Y-Axis)",
+        height=500
+    )
+    
+    st.plotly_chart(fig_matrix, use_container_width=True)
+
+# ==========================================
+# 5. VIEW MODE 2: SINGLE STOCK DEEP-DIVE
+# ==========================================
+else:
+    s = selected_stock
+    d = db[s]
+    
+    st.markdown(f"<div class='main-header'>🔍 Deep-Dive Analysis: {s}</div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='sub-header'>Full Knowledge Object Evaluation (KO-01 to KO-40) | Market Price: {d['m2']['price']:.2f} THB</div>", unsafe_allow_html=True)
+    
+    # Hero Card Section
+    hcol1, hcol2, hcol3, hcol4, hcol5 = st.columns(5)
+    hcol1.metric("CIS Score (KO-38)", f"{d['m6']['cis_score']}/100", d['m6']['grade'])
+    hcol2.metric("Fair Value (KO-11)", f"{d['m2']['fair_value']:.2f} THB", f"{d['m2']['mos']:+.1f}% MoS")
+    hcol3.metric("Tech Signal (KO-21)", d['m3']['signal'].split(" ")[0])
+    hcol4.metric("Risk Level (KO-34)", d['m5']['risk_class'])
+    hcol5.metric("Final Verdict (KO-39)", d['m6']['action'])
+    
+    st.divider()
+
+    # ------------------------------------------
+    # MODULE 1: COMPANY HEALTH (KO-01 to KO-07)
+    # ------------------------------------------
+    if "Module 1" in selected_module:
+        st.subheader("🛡️ Module 1: Company Health Analysis (KO-01 to KO-07)")
+        
+        m1 = d["m1"]
+        col_chart, col_xai = st.columns([6, 5])
+        
+        with col_chart:
+            categories = ['ROE (KO-01)', 'NPM (KO-02)', 'ROA (KO-03)', 'Rev Growth (KO-04)', 'EPS Growth (KO-05)', 'D/E Stability (KO-06)', 'Cash Flow (KO-07)']
+            values = [
+                min(m1["roe"] * 3, 100),
+                min(m1["npm"] * 4, 100),
+                min(m1["roa"] * 5, 100),
+                max(min(m1["rev_growth"] * 3 + 50, 100), 0),
+                max(min(m1["eps_growth"] * 2 + 50, 100), 0),
+                max(100 - (m1["de"] * 25), 10),
+                min(m1["ocf_ni"] * 50, 100)
+            ]
+            
+            fig = go.Figure()
+            fig.add_trace(go.Scatterpolar(
+                r=values + [values[0]],
+                theta=categories + [categories[0]],
+                fill='toself',
+                fillcolor='rgba(59, 130, 246, 0.2)',
+                line=dict(color='#3B82F6', width=2)
+            ))
+            fig.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 100])), showlegend=False)
+            st.plotly_chart(fig, use_container_width=True)
+            
+        with col_xai:
+            st.markdown("<div class='xai-card'>", unsafe_allow_html=True)
+            st.markdown(f"<b>💡 Explainable Reasoning (XAI Engine - Module 1):</b><br>", unsafe_allow_html=True)
+            st.markdown(f"* <b>KO-01 (ROE):</b> ROE อยู่ที่ {m1['roe']}% ซึ่ง {'สูงกว่า' if m1['roe'] > 15 else 'ต่ำกว่า'} เกณฑ์อุตสาหกรรม")
+            st.markdown(f"* <b>KO-02 (NPM):</b> อัตรากำไรสุทธิอยู่ที่ {m1['npm']}% สะท้อน Pricing Power")
+            st.markdown(f"* <b>KO-06 (D/E Ratio):</b> หหนี้สินต่อทุนอยู่ที่ {m1['de']} เท่า {'อยู่ในระดับปลอดภัย' if m1['de'] < 1.5 else 'เสี่ยงสูง'}")
+            st.markdown(f"* <b>KO-07 (Cash Flow Quality):</b> OCF/NI = {m1['ocf_ni']} เท่า {'กำไรมีคุณภาพเป็นเงินสดจริง' if m1['ocf_ni'] >= 1.0 else 'ระวัง Accrual Items'}")
+            st.markdown("</div>", unsafe_allow_html=True)
+
+    # ------------------------------------------
+    # MODULE 2: FAIR VALUE (KO-08 to KO-14)
+    # ------------------------------------------
+    elif "Module 2" in selected_module:
+        st.subheader("💎 Module 2: Fair Value Assessment (KO-08 to KO-14)")
+        
+        m2 = d["m2"]
+        col1, col2, col3, col4 = st.columns(4)
+        col1.metric("Current Market Price", f"{m2['price']:.2f} THB")
+        col2.metric("Consensus Fair Value", f"{m2['fair_value']:.2f} THB")
+        col3.metric("Margin of Safety (KO-14)", f"{m2['mos']:+.1f}%")
+        col4.metric("Valuation Status", "UNDERVALUED" if m2['mos'] > 10 else ("OVERVALUED" if m2['mos'] < -10 else "FAIRLY VALUED"))
+        
+        st.divider()
+        
+        col_chart, col_xai = st.columns([6, 5])
+        with col_chart:
+            models = ['Market Price', 'DCF Bear (KO-12)', 'DCF Base (KO-11)', 'DCF Bull (KO-12)', 'RIM Value (KO-13)', 'Fair Value']
+            vals = [m2['price'], m2['dcf_bear'], m2['dcf_base'], m2['dcf_bull'], m2['rim_value'], m2['fair_value']]
+            
+            fig = go.Figure(data=[go.Bar(x=models, y=vals, marker_color=['#64748B', '#EF4444', '#3B82F6', '#22C55E', '#8B5CF6', '#10B981'])])
+            fig.update_layout(yaxis_title="Price (THB)", height=400)
+            st.plotly_chart(fig, use_container_width=True)
+            
+        with col_xai:
+            st.markdown("<div class='xai-card'>", unsafe_allow_html=True)
+            st.markdown("<b>💡 Valuation Reasoning (KO-08 to KO-14):</b><br>", unsafe_allow_html=True)
+            st.markdown(f"* <b>KO-08 (P/E):</b> Current P/E = {m2['pe']}x (EPS = {m2['eps']} THB)")
+            st.markdown(f"* <b>KO-09 (P/BV):</b> P/BV = {m2['pbv']}x")
+            st.markdown(f"* <b>KO-10 (EV/EBITDA):</b> EV/EBITDA = {m2['ev_ebitda']}x")
+            st.markdown(f"* <b>KO-11 & 12 (DCF Scenario):</b> Base Case {m2['dcf_base']:.2f} THB (Range: {m2['dcf_bear']:.2f} - {m2['dcf_bull']:.2f})")
+            st.markdown(f"* <b>KO-14 (Margin of Safety):</b> {m2['mos']:+.1f}% {'มีเกราะป้องกันความเสี่ยงหนา' if m2['mos'] > 15 else 'ไร้เกราะคุ้มกันความเสี่ยง'}")
+            st.markdown("</div>", unsafe_allow_html=True)
+
+    # ------------------------------------------
+    # MODULE 3: ENTRY TIMING (KO-15 to KO-21)
+    # ------------------------------------------
+    elif "Module 3" in selected_module:
+        st.subheader("⏱️ Module 3: Entry Timing & Technicals (KO-15 to KO-21)")
+        
+        m3 = d["m3"]
+        col1, col2, col3, col4 = st.columns(4)
+        col1.metric("Trend (KO-15)", m3['trend'])
+        col2.metric("RSI Momentum (KO-16)", f"{m3['rsi']}")
+        col3.metric("ADX Strength (KO-17)", f"{m3['adx']}")
+        col4.metric("Volume Pattern (KO-19)", m3['vol_trend'])
+        
+        st.divider()
+        
+        st.markdown("<div class='xai-card'>", unsafe_allow_html=True)
+        st.markdown(f"<b>💡 Technical Signal Synthesis (KO-21):</b><br>", unsafe_allow_html=True)
+        st.markdown(f"* <b>Integrated Verdict:</b> <span class='status-strong-buy'>{m3['signal']}</span>", unsafe_allow_html=True)
+        st.markdown(f"* <b>KO-20 Key Levels:</b> Support = {m3['support']} THB | Resistance = {m3['resistance']} THB")
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    # ------------------------------------------
+    # MODULE 4: AI PREDICTION (KO-22 to KO-27)
+    # ------------------------------------------
+    elif "Module 4" in selected_module:
+        st.subheader("🤖 Module 4: AI Horizon Prediction & XAI (KO-22 to KO-27)")
+        
+        m4 = d["m4"]
+        p = d["m2"]["price"]
+        
+        col1, col2, col3, col4 = st.columns(4)
+        col1.metric("7D Forecast (KO-22)", f"{m4['pred_7d']:.2f} THB", f"{((m4['pred_7d']-p)/p)*100:+.1f}%")
+        col2.metric("30D Forecast (KO-23)", f"{m4['pred_30d']:.2f} THB", f"{((m4['pred_30d']-p)/p)*100:+.1f}%")
+        col3.metric("90D Forecast (KO-24)", f"{m4['pred_90d']:.2f} THB", f"{((m4['pred_90d']-p)/p)*100:+.1f}%")
+        col4.metric("Model Confidence (KO-25)", f"{m4['confidence']}%")
+        
+        st.divider()
+        
+        st.subheader("📌 SHAP Feature Importance (KO-26: Opening the AI Black-Box)")
+        col_pos, col_neg = st.columns(2)
+        with col_pos:
+            st.success(f"🟢 **Top Positive Drivers:** {', '.join(m4['top_pos'])}")
+        with col_neg:
+            st.error(f"🔴 **Top Negative Drivers:** {', '.join(m4['top_neg'])}")
+
+    # ------------------------------------------
+    # MODULE 5: RISK ANALYSIS (KO-28 to KO-34)
+    # ------------------------------------------
+    elif "Module 5" in selected_module:
+        st.subheader("⚠️ Module 5: Risk Analysis & Stress Testing (KO-28 to KO-34)")
+        
+        m5 = d["m5"]
+        col1, col2, col3, col4 = st.columns(4)
+        col1.metric("Market Beta (KO-28)", f"{m5['beta']} x")
+        col2.metric("Annual Volatility (KO-29)", f"{m5['volatility']}%")
+        col3.metric("Interest Coverage (KO-30)", f"{m5['icr']} x")
+        col4.metric("1D VaR 95% (KO-31)", f"{m5['var_95']}%")
+        
+        st.divider()
+        
+        st.markdown("<div class='xai-card'>", unsafe_allow_html=True)
+        st.markdown(f"<b>💡 Risk Aggregation Synthesis (KO-34):</b><br>", unsafe_allow_html=True)
+        st.markdown(f"* <b>Overall Risk Score:</b> {m5['risk_score']}/100 ({m5['risk_class']})")
+        st.markdown(f"* <b>KO-32 Sharpe Ratio:</b> {m5['sharpe']} x")
+        st.markdown(f"* <b>KO-33 Macro Stress Test Impact:</b> {m5['stress_impact']}% Valuation Reduction under Recession Scenario")
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    # ------------------------------------------
+    # MODULE 6: STRATEGIC MATRIX (KO-35 to KO-40)
+    # ------------------------------------------
+    elif "Module 6" in selected_module:
+        st.subheader("🎯 Module 6: Strategic Matrix & Execution (KO-35 to KO-40)")
+        
+        m6 = d["m6"]
+        col1, col2, col3, col4 = st.columns(4)
+        col1.metric("Sector Percentile (KO-35)", f"{m6['percentile']}th")
+        col2.metric("Strategic Quadrant (KO-37)", m6['quadrant'])
+        col3.metric("Final Verdict (KO-39)", m6['action'])
+        col4.metric("Position Size (KO-40)", m6['sizing'])
+        
+        st.divider()
+        
+        st.markdown("<div class='xai-card'>", unsafe_allow_html=True)
+        st.markdown(f"<b>💡 Final Execution Logic (KO-38 to KO-40):</b><br>", unsafe_allow_html=True)
+        st.markdown(f"* <b>KO-38 Composite Score:</b> {m6['cis_score']}/100 ({m6['grade']})")
+        st.markdown(f"* <b>Actionable Recommendation:</b> <span class='status-strong-buy'>{m6['action']}</span>", unsafe_allow_html=True)
+        st.markdown(f"* <b>Capital Allocation Strategy:</b> Allocation set to <b>{m6['sizing']}</b> based on Risk Parity Principles.")
+        st.markdown("</div>", unsafe_allow_html=True)
