@@ -24,9 +24,22 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Custom CSS สำหรับคุมกรอบ Card ให้คลุมสวยงามเหมือนรูปที่ 2
 st.markdown("""
     <style>
-    .stApp { background-color: #0A0E17; color: #E2E8F0; }
+    .stApp { background-color: #0B0F19; color: #E2E8F0; }
+    
+    /* Card Container Style - คลุมองค์ประกอบทั้งหมด */
+    .module-card {
+        background-color: #111827;
+        border: 1px solid #1F2937;
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 12px;
+        text-align: center;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+    }
+    
     .dashboard-card {
         background-color: #111827;
         border: 1px solid #1F2937;
@@ -34,11 +47,14 @@ st.markdown("""
         padding: 16px;
         margin-bottom: 16px;
     }
-    .badge-excellent { background-color: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid #10B981; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 12px; }
-    .badge-good { background-color: rgba(59, 130, 246, 0.15); color: #3B82F6; border: 1px solid #3B82F6; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 12px; }
-    .badge-warn { background-color: rgba(245, 158, 11, 0.15); color: #F59E0B; border: 1px solid #F59E0B; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 12px; }
-    .badge-danger { background-color: rgba(239, 68, 68, 0.15); color: #EF4444; border: 1px solid #EF4444; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 12px; }
-    .star-rating { font-size: 18px; color: #F59E0B; font-weight: bold; letter-spacing: 2px; }
+    
+    .badge-excellent { background-color: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid #10B981; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 11px; display: inline-block; margin-top: 6px; }
+    .badge-good { background-color: rgba(59, 130, 246, 0.15); color: #3B82F6; border: 1px solid #3B82F6; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 11px; display: inline-block; margin-top: 6px; }
+    .badge-warn { background-color: rgba(245, 158, 11, 0.15); color: #F59E0B; border: 1px solid #F59E0B; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 11px; display: inline-block; margin-top: 6px; }
+    .badge-danger { background-color: rgba(239, 68, 68, 0.15); color: #EF4444; border: 1px solid #EF4444; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 11px; display: inline-block; margin-top: 6px; }
+    
+    .star-rating { font-size: 16px; color: #F59E0B; letter-spacing: 2px; margin-top: 4px; }
+    .card-title { font-size: 12px; font-weight: bold; color: #94A3B8; letter-spacing: 0.5px; }
     .metric-value { font-size: 20px; font-weight: bold; color: #FFFFFF; }
     .metric-label { font-size: 11px; color: #64748B; }
     </style>
@@ -52,23 +68,23 @@ def render_stars(score_100):
     stars = max(1, min(5, stars))
     return "★" * stars + "☆" * (5 - stars)
 
-def create_donut_ring(score, color="#10B981", height=120):
+def create_donut_ring(score, color="#10B981", height=110):
     fig = go.Figure(data=[go.Pie(
         labels=['Score', 'Remaining'],
         values=[score, max(100 - score, 0)],
-        hole=0.78,
+        hole=0.75,
         marker_colors=[color, "#1F2937"],
         textinfo='none',
         hoverinfo='none'
     )])
     fig.update_layout(
         showlegend=False,
-        margin=dict(t=5, b=5, l=5, r=5),
+        margin=dict(t=2, b=2, l=2, r=2),
         height=height,
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
         annotations=[dict(
-            text=f"<b style='font-size:20px;color:white;'>{score:.0f}</b><br><span style='font-size:10px;color:#94A3B8;'>/100</span>",
+            text=f"<b style='font-size:18px;color:white;'>{score:.0f}</b><br><span style='font-size:9px;color:#94A3B8;'>/100</span>",
             x=0.5, y=0.5, showarrow=False
         )]
     )
@@ -101,7 +117,6 @@ stock_list = ["ADVANC", "CCET", "DELTA", "HANA", "JMART", "KCE", "TRUE", "THCOM"
 
 @st.cache_data
 def get_raw_financial_db():
-    # ข้อมูลดิบงบการเงินจริงย้อนหลังของหุ้นทั้ง 8 ตัว
     return {
         "ADVANC": {
             "name": "Advanced Info Service PCL", "price": 285.00, "mcap": "847,700 MB", "pe": 25.4, "pb": 8.2, "div": 3.85, "sector": "Technology", "industry": "Telecommunication", "eps": 11.22,
@@ -160,7 +175,6 @@ def calculate_stock_metrics(stock_data):
     p = stock_data["price"]
     eps = stock_data["eps"]
     
-    # 1. Module 1 Sub-Scores Calculation
     m1_dims = [
         {"name": "1. PROFITABILITY", "score": min(f["ROE"] * 3.0, 100), "w": "30%", "w_num": 0.30},
         {"name": "2. GROWTH", "score": max(min(f["RevGrowth"] * 2.5 + 50, 100), 10), "w": "15%", "w_num": 0.15},
@@ -171,10 +185,8 @@ def calculate_stock_metrics(stock_data):
         {"name": "7. EARNINGS QLTY", "score": min(f["NPM"] * 3.5, 100), "w": "5%", "w_num": 0.05}
     ]
     
-    # M1 Overall Score
     m1_score = sum([d["score"] * d["w_num"] for d in m1_dims])
     
-    # 2. Module 2 Fair Value Calculation (DCF & Relative Model)
     growth_rate = max(f["NetGrowth"] / 100, 0.03)
     target_pe = max(stock_data["pe"] * 0.85, 12.0)
     
@@ -185,16 +197,13 @@ def calculate_stock_metrics(stock_data):
     mos_pct = ((fair_base - p) / fair_base) * 100
     m2_score = max(min(50 + (mos_pct * 2), 100), 10)
     
-    # 3. Other Module Scores Engine
-    m3_score = 65.0  # Technical Timing
-    m4_score = max(min(50 + (f["NetGrowth"] * 0.8), 95), 20)  # AI Horizon
-    m5_score = max(100 - (f["DE"] * 18), 15)  # Risk Score
-    m6_score = m1_score * 0.95  # Industry Rank
+    m3_score = 65.0
+    m4_score = max(min(50 + (f["NetGrowth"] * 0.8), 95), 20)
+    m5_score = max(100 - (f["DE"] * 18), 15)
+    m6_score = m1_score * 0.95
     
-    # Composite Overall CIS Score
     overall_score = (m1_score * 0.35) + (m2_score * 0.35) + (m4_score * 0.15) + (m5_score * 0.15)
     
-    # Final Action Recommendation
     if overall_score >= 80 and mos_pct > 10:
         rec = "STRONG BUY"
         rec_text = "VERY ATTRACTIVE"
@@ -225,6 +234,24 @@ def calculate_stock_metrics(stock_data):
         "rec_text": rec_text
     }
 
+# Helper สำหรับสร้าง Card คลุมสวยงามแบบรูปที่ 2
+def render_module_card(title, score, color, badge_text, badge_class):
+    fig = create_donut_ring(score, color=color)
+    stars = render_stars(score)
+    
+    st.markdown(f"""
+        <div class='module-card'>
+            <div class='card-title'>{title}</div>
+    """, unsafe_allow_html=True)
+    
+    st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
+    
+    st.markdown(f"""
+            <div class='star-rating'>{stars}</div>
+            <div class='{badge_class}'>{badge_text}</div>
+        </div>
+    """, unsafe_allow_html=True)
+
 # ==========================================
 # 5. SIDEBAR & APP CONTROLS
 # ==========================================
@@ -235,7 +262,6 @@ with st.sidebar:
     st.caption("Dynamic Expert System v1.0")
     st.divider()
     
-    # 📌 ช่องเลือกบริษัทสำหรับดูทีละตัว
     selected_symbol = st.selectbox("📌 เลือกบริษัทที่ต้องการวิเคราะห์:", stock_list, index=0)
     st.divider()
     
@@ -249,11 +275,10 @@ with st.sidebar:
         " Industry Benchmark"
     ])
 
-# ดึงข้อมูลดิบและประมวลผลคำนวณสด
 stock_raw = raw_db[selected_symbol]
 calc = calculate_stock_metrics(stock_raw)
 
-# Header Bar แสดงข้อมูลปัจจุบันของหุ้นที่เลือก
+# Header Bar
 st.markdown(f"""
     <div style='display: flex; justify-content: space-between; align-items: center; background-color: #111827; padding: 12px 20px; border-radius: 10px; border: 1px solid #1F2937; margin-bottom: 20px;'>
         <div>
@@ -272,7 +297,7 @@ st.markdown(f"""
 # ==========================================
 if "Overview" in selected_tab:
     st.markdown("## OVERVIEW DASHBOARD")
-    st.caption("AI-Powered Investment Decision Support System (Dynamic Calculations)")
+    st.caption("AI-Powered Investment Decision Support System")
     
     col_left, col_mid, col_right = st.columns([3, 5, 3])
     
@@ -283,12 +308,11 @@ if "Overview" in selected_tab:
                 <div style='font-size:20px; font-weight:bold; color:white;'>{selected_symbol} ☆</div>
                 <div style='font-size:12px; color:#94A3B8;'>{stock_raw['name']}</div>
                 <div style='font-size:28px; font-weight:bold; color:white; margin-top:10px;'>{stock_raw['price']:.2f} <span style='font-size:14px;'>THB</span></div>
-                <div style='font-size:10px; color:#64748B; margin-top:5px;'>Real-time Calculation Engine</div>
             </div>
         """, unsafe_allow_html=True)
         
         fig_spark = create_mini_sparkline(stock_raw["prices_hist"])
-        st.plotly_chart(fig_spark, use_container_width=True)
+        st.plotly_chart(fig_spark, use_container_width=True, config={'displayModeBar': False})
         
         st.markdown(f"""
             <div class='dashboard-card'>
@@ -307,66 +331,36 @@ if "Overview" in selected_tab:
             </div>
         """, unsafe_allow_html=True)
 
-    # --- MIDDLE COLUMN ---
+    # --- MIDDLE COLUMN: 6 Modules Grid (การ์ดคลุมองค์ประกอบทั้งหมด) ---
     with col_mid:
         st.markdown("##### INVESTMENT DECISION OVERVIEW")
         
         m_row1_col1, m_row1_col2, m_row1_col3 = st.columns(3)
         with m_row1_col1:
-            st.markdown("<div class='dashboard-card' style='text-align:center;'>", unsafe_allow_html=True)
-            st.caption("01 COMPANY HEALTH")
-            st.plotly_chart(create_donut_ring(calc["m1_score"], color="#10B981", height=100), use_container_width=True)
-            st.markdown(f"<div class='star-rating'>{render_stars(calc['m1_score'])}</div>", unsafe_allow_html=True)
-            st.markdown(f"<div class='badge-excellent'>SCORE {calc['m1_score']}</div>", unsafe_allow_html=True)
-            st.markdown("</div>", unsafe_allow_html=True)
+            render_module_card("01 COMPANY HEALTH", calc["m1_score"], "#10B981", f"SCORE {calc['m1_score']}", "badge-excellent")
             
         with m_row1_col2:
-            st.markdown("<div class='dashboard-card' style='text-align:center;'>", unsafe_allow_html=True)
-            st.caption("02 FAIR VALUE")
-            st.plotly_chart(create_donut_ring(calc["m2_score"], color="#F59E0B", height=100), use_container_width=True)
-            st.markdown(f"<div class='star-rating'>{render_stars(calc['m2_score'])}</div>", unsafe_allow_html=True)
-            mos_badge = "badge-excellent" if calc['mos_pct'] > 0 else "badge-danger"
-            st.markdown(f"<div class='{mos_badge}'>MoS {calc['mos_pct']:+.1f}%</div>", unsafe_allow_html=True)
-            st.markdown("</div>", unsafe_allow_html=True)
+            mos_class = "badge-excellent" if calc['mos_pct'] > 0 else "badge-danger"
+            render_module_card("02 FAIR VALUE", calc["m2_score"], "#F59E0B", f"MoS {calc['mos_pct']:+.1f}%", mos_class)
 
         with m_row1_col3:
-            st.markdown("<div class='dashboard-card' style='text-align:center;'>", unsafe_allow_html=True)
-            st.caption("03 ENTRY TIMING")
-            st.plotly_chart(create_donut_ring(calc["m3_score"], color="#3B82F6", height=100), use_container_width=True)
-            st.markdown(f"<div class='star-rating'>{render_stars(calc['m3_score'])}</div>", unsafe_allow_html=True)
-            st.markdown("<div class='badge-good'>NEUTRAL</div>", unsafe_allow_html=True)
-            st.markdown("</div>", unsafe_allow_html=True)
+            render_module_card("03 ENTRY TIMING", calc["m3_score"], "#3B82F6", "NEUTRAL", "badge-good")
 
         m_row2_col1, m_row2_col2, m_row2_col3 = st.columns(3)
         with m_row2_col1:
-            st.markdown("<div class='dashboard-card' style='text-align:center;'>", unsafe_allow_html=True)
-            st.caption("04 AI PREDICTION")
-            st.plotly_chart(create_donut_ring(calc["m4_score"], color="#8B5CF6", height=100), use_container_width=True)
-            st.markdown(f"<div class='star-rating'>{render_stars(calc['m4_score'])}</div>", unsafe_allow_html=True)
-            st.markdown("<div style='color:#8B5CF6; font-weight:bold; font-size:12px;'>POSITIVE</div>", unsafe_allow_html=True)
-            st.markdown("</div>", unsafe_allow_html=True)
+            render_module_card("04 AI PREDICTION", calc["m4_score"], "#8B5CF6", "POSITIVE", "badge-good")
 
         with m_row2_col2:
-            st.markdown("<div class='dashboard-card' style='text-align:center;'>", unsafe_allow_html=True)
-            st.caption("05 RISK ANALYSIS")
-            st.plotly_chart(create_donut_ring(calc["m5_score"], color="#F97316", height=100), use_container_width=True)
-            st.markdown(f"<div class='star-rating'>{render_stars(calc['m5_score'])}</div>", unsafe_allow_html=True)
-            st.markdown("<div class='badge-warn'>MODERATE</div>", unsafe_allow_html=True)
-            st.markdown("</div>", unsafe_allow_html=True)
+            render_module_card("05 RISK ANALYSIS", calc["m5_score"], "#F97316", "MODERATE", "badge-warn")
 
         with m_row2_col3:
-            st.markdown("<div class='dashboard-card' style='text-align:center;'>", unsafe_allow_html=True)
-            st.caption("06 BENCHMARK")
-            st.plotly_chart(create_donut_ring(calc["m6_score"], color="#06B6D4", height=100), use_container_width=True)
-            st.markdown(f"<div class='star-rating'>{render_stars(calc['m6_score'])}</div>", unsafe_allow_html=True)
-            st.markdown("<div class='badge-excellent'>OUTPERFORM</div>", unsafe_allow_html=True)
-            st.markdown("</div>", unsafe_allow_html=True)
+            render_module_card("06 BENCHMARK", calc["m6_score"], "#06B6D4", "OUTPERFORM", "badge-excellent")
 
     # --- RIGHT COLUMN ---
     with col_right:
         st.markdown("<div class='dashboard-card' style='text-align:center;'>", unsafe_allow_html=True)
         st.markdown("##### AI INVESTMENT SUMMARY")
-        st.plotly_chart(create_gauge_meter(calc["overall_score"]), use_container_width=True)
+        st.plotly_chart(create_gauge_meter(calc["overall_score"]), use_container_width=True, config={'displayModeBar': False})
         st.markdown(f"<div class='star-rating' style='font-size:22px;'>{render_stars(calc['overall_score'])}</div>", unsafe_allow_html=True)
         st.markdown(f"<h3 style='color:#10B981; margin:5px 0;'>{calc['rec_text']}</h3>", unsafe_allow_html=True)
         st.caption(f"ประเมินจากตรรกะงบการเงินจริงของ {selected_symbol}")
@@ -375,8 +369,8 @@ if "Overview" in selected_tab:
         st.markdown(f"<h2 style='color:#10B981; margin:0;'>🚀 {calc['rec']}</h2>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # --- BOTTOM ROW: DYNAMIC HIGHLIGHTS CARDS ---
-    st.markdown("##### KEY HIGHLIGHTS (DYNAMIC FINANCIALS)")
+    # --- BOTTOM ROW: HIGHLIGHT CARDS ---
+    st.markdown("##### KEY HIGHLIGHTS")
     h_col1, h_col2, h_col3, h_col4, h_col5, h_col6 = st.columns(6)
     fin = stock_raw["financials"]
     
@@ -398,12 +392,11 @@ if "Overview" in selected_tab:
 # ==========================================
 elif "Company Health" in selected_tab:
     st.markdown(f"## COMPANY HEALTH ANALYSIS ({selected_symbol})")
-    st.caption("ประเมินสุขภาพทางการเงินสดจาก 7 มิติสำคัญ")
     
     col1, col2 = st.columns([4, 8])
     with col1:
         st.markdown("<div class='dashboard-card' style='text-align:center;'>", unsafe_allow_html=True)
-        st.plotly_chart(create_donut_ring(calc["m1_score"], color="#10B981", height=130), use_container_width=True)
+        st.plotly_chart(create_donut_ring(calc["m1_score"], color="#10B981", height=130), use_container_width=True, config={'displayModeBar': False})
         st.markdown(f"<div class='star-rating'>{render_stars(calc['m1_score'])}</div>", unsafe_allow_html=True)
         st.markdown(f"### SCORE {calc['m1_score']} / 100")
         st.markdown("</div>", unsafe_allow_html=True)
@@ -418,12 +411,7 @@ elif "Company Health" in selected_tab:
     dim_cols = st.columns(7)
     for idx, dim in enumerate(calc["m1_dims"]):
         with dim_cols[idx]:
-            st.markdown("<div class='dashboard-card' style='text-align:center; padding:8px;'>", unsafe_allow_html=True)
-            st.caption(dim["name"])
-            st.caption(f"Weight {dim['w']}")
-            st.plotly_chart(create_donut_ring(round(dim["score"]), color="#10B981", height=80), use_container_width=True)
-            st.markdown(f"<div class='star-rating' style='font-size:10px;'>{render_stars(dim['score'])}</div>", unsafe_allow_html=True)
-            st.markdown("</div>", unsafe_allow_html=True)
+            render_module_card(dim["name"], round(dim["score"]), "#10B981", f"W: {dim['w']}", "badge-excellent")
 
     st.divider()
     st.markdown("##### 📋 FINANCIAL STATEMENT HISTORY & RATIOS")
