@@ -24,31 +24,24 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS กำหนดกรอบให้สูงเท่ากันเป๊ะ และไม่มีข้อความ HTML หลุด
+# Custom CSS ตกแต่งสไตล์ Dark Theme และคุมกรอบ Sidebar ให้เป็นสีมืดเข้ากัน
 st.markdown("""
     <style>
-    .stApp { background-color: #0A0E1A; color: #E2E8F0; }
-    
-    /* กรอบใหญ่ครอบแต่ละ Panel บังคับความสูงให้เท่ากันเหมือนภาพที่ 3 */
-    .panel-box {
-        background-color: #101625;
-        border: 1px solid #1E293B;
-        border-radius: 12px;
-        padding: 20px;
-        height: 100%;
-        min-height: 520px;
-        box-sizing: border-box;
+    /* Dark Theme พื้นหลังหลัก และ Sidebar */
+    .stApp, [data-testid="stSidebar"] {
+        background-color: #0A0E1A !important;
+        color: #E2E8F0 !important;
     }
     
-    /* Grid 3x2 สำหรับ 6 โมดูลย่อยภายในกรอบกลาง */
-    .modules-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 12px;
-        margin-top: 15px;
+    /* ปรับแต่ง Streamlit Container ให้เป็นการ์ดสีมืดขอบมนสวยงาม */
+    [data-testid="stVerticalBlockBorderWrapper"] {
+        background-color: #101625 !important;
+        border: 1px solid #1E293B !important;
+        border-radius: 12px !important;
+        padding: 10px !important;
     }
     
-    /* การ์ดโมดูลย่อย 6 ใบ */
+    /* 6 โมดูลย่อยภายในกรอบกลาง */
     .module-card-inner {
         background-color: #172033;
         border: 1px solid #232D42;
@@ -59,7 +52,7 @@ st.markdown("""
         flex-direction: column;
         align-items: center;
         justify-content: space-between;
-        min-height: 200px;
+        min-height: 220px;
     }
     
     /* Donut Ring CSS */
@@ -67,7 +60,7 @@ st.markdown("""
         position: relative;
         width: 68px;
         height: 68px;
-        margin: 4px auto;
+        margin: 6px auto;
     }
     
     .donut-ring {
@@ -102,14 +95,6 @@ st.markdown("""
     .star-rating { font-size: 12px; color: #F59E0B; letter-spacing: 1px; margin-top: 2px; }
     .card-title { font-size: 10px; font-weight: 700; color: #94A3B8; letter-spacing: 0.5px; text-transform: uppercase; }
     .card-desc { font-size: 9px; color: #64748B; margin-top: 4px; line-height: 1.2; padding: 0 2px; }
-    
-    /* Key Highlight Cards ด้านล่าง */
-    .highlight-card {
-        background-color: #101625;
-        border: 1px solid #1E293B;
-        border-radius: 10px;
-        padding: 12px;
-    }
     
     .metric-value { font-size: 18px; font-weight: bold; color: #FFFFFF; }
     .metric-label { font-size: 11px; color: #64748B; }
@@ -157,7 +142,7 @@ def create_gauge_meter(score):
             'bordercolor': "rgba(0,0,0,0)"
         }
     ))
-    fig.update_layout(height=130, margin=dict(t=20, b=0, l=10, r=10), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+    fig.update_layout(height=135, margin=dict(t=20, b=0, l=10, r=10), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
     return fig
 
 def create_stock_price_chart(dates, prices, color="#10B981"):
@@ -172,7 +157,7 @@ def create_stock_price_chart(dates, prices, color="#10B981"):
     ))
     
     fig.update_layout(
-        height=125,
+        height=130,
         margin=dict(t=10, b=20, l=10, r=35),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
@@ -372,9 +357,7 @@ if "Overview" in selected_tab:
     
     # --- LEFT COLUMN (Panel ซ้ายราคาหุ้น) ---
     with col_left:
-        with st.container():
-            st.markdown("<div class='panel-box'>", unsafe_allow_html=True)
-            
+        with st.container(border=True):
             st.markdown(f"""
                 <div style='font-size:20px; font-weight:bold; color:white;'>{selected_symbol} ☆</div>
                 <div style='font-size:12px; color:#94A3B8; margin-bottom:12px;'>{stock_raw['name']}</div>
@@ -401,12 +384,12 @@ if "Overview" in selected_tab:
                     <div><div class='metric-label'>Dividend Yield</div><div class='metric-value' style='font-size:13px;'>{stock_raw['div']}%</div></div>
                 </div>
             """, unsafe_allow_html=True)
-            
-            st.markdown("</div>", unsafe_allow_html=True)
 
-    # --- MIDDLE COLUMN (Panel กลางครอบ 6 โมดูลสมบูรณ์แบบ 100%) ---
+    # --- MIDDLE COLUMN (Panel กลางครอบ 6 โมดูล ยึดด้วย st.container(border=True)) ---
     with col_mid:
-        with st.container():
+        with st.container(border=True):
+            st.markdown("<h5 style='margin-bottom:10px; color:white;'>INVESTMENT DECISION OVERVIEW</h5>", unsafe_allow_html=True)
+            
             mos_class = "badge-excellent" if calc['mos_pct'] > 0 else "badge-danger"
             mos_label = "UNDERVALUED" if calc['mos_pct'] > 0 else "OVERVALUED"
             
@@ -418,40 +401,34 @@ if "Overview" in selected_tab:
             c6_html = get_module_card_html("06", "BENCHMARK", calc["m6_score"], "#06B6D4", "OUTPERFORM", "badge-excellent", "Outperforming industry average across metrics")
             
             middle_html = f"""
-                <div class='panel-box'>
-                    <h5 style='margin-bottom:15px; color:white;'>INVESTMENT DECISION OVERVIEW</h5>
-                    <div class='modules-grid'>
-                        {c1_html}
-                        {c2_html}
-                        {c3_html}
-                        {c4_html}
-                        {c5_html}
-                        {c6_html}
-                    </div>
+                <div class='modules-grid'>
+                    {c1_html}
+                    {c2_html}
+                    {c3_html}
+                    {c4_html}
+                    {c5_html}
+                    {c6_html}
                 </div>
             """
             st.markdown(middle_html, unsafe_allow_html=True)
 
-    # --- RIGHT COLUMN (Panel ขวาครอบ AI Summary สมบูรณ์แบบ) ---
+    # --- RIGHT COLUMN (Panel ขวาครอบ AI Summary ยึดด้วย st.container(border=True)) ---
     with col_right:
-        with st.container():
-            st.markdown("<div class='panel-box' style='text-align:center;'>", unsafe_allow_html=True)
-            st.markdown("<h5 style='margin-bottom:15px; color:white;'>AI INVESTMENT SUMMARY</h5>", unsafe_allow_html=True)
+        with st.container(border=True):
+            st.markdown("<h5 style='margin-bottom:10px; color:white; text-align:center;'>AI INVESTMENT SUMMARY</h5>", unsafe_allow_html=True)
             
             st.plotly_chart(create_gauge_meter(calc["overall_score"]), use_container_width=True, config={'displayModeBar': False})
             
-            st.markdown(f"<div style='color:#94A3B8; font-size:10px; font-weight:bold; margin-top:-10px;'>OVERALL SCORE</div>", unsafe_allow_html=True)
-            st.markdown(f"<div class='star-rating' style='font-size:18px;'>{render_stars(calc['overall_score'])}</div>", unsafe_allow_html=True)
-            st.markdown(f"<h3 style='color:#10B981; margin:6px 0;'>{calc['rec_text']}</h3>", unsafe_allow_html=True)
+            st.markdown(f"<div style='color:#94A3B8; font-size:10px; font-weight:bold; text-align:center; margin-top:-10px;'>OVERALL SCORE</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='star-rating' style='font-size:18px; text-align:center;'>{render_stars(calc['overall_score'])}</div>", unsafe_allow_html=True)
+            st.markdown(f"<h3 style='color:#10B981; margin:6px 0; text-align:center;'>{calc['rec_text']}</h3>", unsafe_allow_html=True)
             
-            st.markdown(f"<p style='font-size:11px; color:#94A3B8; line-height:1.4;'>{selected_symbol} shows attractive investment potential with strong fundamentals and solid AI predictions.</p>", unsafe_allow_html=True)
+            st.markdown(f"<p style='font-size:11px; color:#94A3B8; line-height:1.4; text-align:center;'>{selected_symbol} shows attractive investment potential with strong fundamentals and solid AI predictions.</p>", unsafe_allow_html=True)
             
             st.divider()
-            st.markdown("<div style='color:#64748B; font-size:11px; font-weight:bold;'>RECOMMENDATION</div>", unsafe_allow_html=True)
-            st.markdown(f"<h2 style='color:#10B981; margin:5px 0;'>🚀 {calc['rec']}</h2>", unsafe_allow_html=True)
-            st.caption("Investment Horizon: LONG TERM (12+ Months)")
-            
-            st.markdown("</div>", unsafe_allow_html=True)
+            st.markdown("<div style='color:#64748B; font-size:11px; font-weight:bold; text-align:center;'>RECOMMENDATION</div>", unsafe_allow_html=True)
+            st.markdown(f"<h2 style='color:#10B981; margin:5px 0; text-align:center;'>🚀 {calc['rec']}</h2>", unsafe_allow_html=True)
+            st.markdown("<div style='text-align:center; font-size:10px; color:#64748B;'>Investment Horizon: LONG TERM (12+ Months)</div>", unsafe_allow_html=True)
 
     # --- BOTTOM ROW: HIGHLIGHT CARDS ---
     st.markdown("##### KEY HIGHLIGHTS")
@@ -459,17 +436,23 @@ if "Overview" in selected_tab:
     fin = stock_raw["financials"]
     
     with h_col1:
-        st.markdown(f"<div class='highlight-card'>📈 <span class='metric-label'>Revenue Growth</span><div class='metric-value' style='color:#10B981;'>{fin['RevGrowth']:+.1f}%</div><span class='metric-label'>YoY 2024</span></div>", unsafe_allow_html=True)
+        with st.container(border=True):
+            st.markdown(f"📈 <span class='metric-label'>Revenue Growth</span><div class='metric-value' style='color:#10B981;'>{fin['RevGrowth']:+.1f}%</div><span class='metric-label'>YoY 2024</span>", unsafe_allow_html=True)
     with h_col2:
-        st.markdown(f"<div class='highlight-card'>💰 <span class='metric-label'>Net Profit Growth</span><div class='metric-value' style='color:#10B981;'>{fin['NetGrowth']:+.1f}%</div><span class='metric-label'>YoY 2024</span></div>", unsafe_allow_html=True)
+        with st.container(border=True):
+            st.markdown(f"💰 <span class='metric-label'>Net Profit Growth</span><div class='metric-value' style='color:#10B981;'>{fin['NetGrowth']:+.1f}%</div><span class='metric-label'>YoY 2024</span>", unsafe_allow_html=True)
     with h_col3:
-        st.markdown(f"<div class='highlight-card'>🔄 <span class='metric-label'>ROE (TTM)</span><div class='metric-value' style='color:#3B82F6;'>{fin['ROE']:.1f}%</div><span class='metric-label'>High Efficiency</span></div>", unsafe_allow_html=True)
+        with st.container(border=True):
+            st.markdown(f"🔄 <span class='metric-label'>ROE (TTM)</span><div class='metric-value' style='color:#3B82F6;'>{fin['ROE']:.1f}%</div><span class='metric-label'>High Efficiency</span>", unsafe_allow_html=True)
     with h_col4:
-        st.markdown(f"<div class='highlight-card'>💵 <span class='metric-label'>Free Cash Flow</span><div class='metric-value' style='font-size:14px;'>{fin['FCF']}</div><span class='metric-label'>Strong Cash Gen</span></div>", unsafe_allow_html=True)
+        with st.container(border=True):
+            st.markdown(f"💵 <span class='metric-label'>Free Cash Flow</span><div class='metric-value' style='font-size:14px;'>{fin['FCF']}</div><span class='metric-label'>Strong Cash Gen</span>", unsafe_allow_html=True)
     with h_col5:
-        st.markdown(f"<div class='highlight-card'>🛡️ <span class='metric-label'>Debt to Equity</span><div class='metric-value' style='color:#F59E0B;'>{fin['DE']:.2f}x</div><span class='metric-label'>Low Risk</span></div>", unsafe_allow_html=True)
+        with st.container(border=True):
+            st.markdown(f"🛡️ <span class='metric-label'>Debt to Equity</span><div class='metric-value' style='color:#F59E0B;'>{fin['DE']:.2f}x</div><span class='metric-label'>Low Risk</span>", unsafe_allow_html=True)
     with h_col6:
-        st.markdown(f"<div class='highlight-card'>🏆 <span class='metric-label'>Industry Rank</span><div class='metric-value' style='color:#06B6D4;'>{fin['Rank']}</div><span class='metric-label'>In Sector</span></div>", unsafe_allow_html=True)
+        with st.container(border=True):
+            st.markdown(f"🏆 <span class='metric-label'>Industry Rank</span><div class='metric-value' style='color:#06B6D4;'>{fin['Rank']}</div><span class='metric-label'>In Sector</span>", unsafe_allow_html=True)
 
 # ==========================================
 # 7. TAB 2: COMPANY HEALTH
@@ -482,10 +465,9 @@ elif "Company Health" in selected_tab:
         st.markdown(get_module_card_html("01", "OVERALL HEALTH SCORE", calc["m1_score"], "#10B981", f"SCORE {calc['m1_score']}", "badge-excellent", "Strong financial health"), unsafe_allow_html=True)
 
     with col2:
-        st.markdown("<div class='panel-box'>", unsafe_allow_html=True)
-        st.markdown("##### 💡 EXPLAINABLE AI REASONING")
-        st.write(f"จากการประมวลผลตรรกะ Rule-Based: บริษัท {selected_symbol} มีคะแนน ROE เท่ากับ {stock_raw['financials']['ROE']}% และมีภาระหนี้สิน D/E เท่ากับ {stock_raw['financials']['DE']}x ส่งผลให้ระดับเสถียรภาพทางการเงินอยู่ในเกณฑ์สอดคล้องกับมาตรฐาน KOS 1.0")
-        st.markdown("</div>", unsafe_allow_html=True)
+        with st.container(border=True):
+            st.markdown("##### 💡 EXPLAINABLE AI REASONING")
+            st.write(f"จากการประมวลผลตรรกะ Rule-Based: บริษัท {selected_symbol} มีคะแนน ROE เท่ากับ {stock_raw['financials']['ROE']}% และมีภาระหนี้สิน D/E เท่ากับ {stock_raw['financials']['DE']}x ส่งผลให้ระดับเสถียรภาพทางการเงินอยู่ในเกณฑ์สอดคล้องกับมาตรฐาน KOS 1.0")
 
     st.markdown("##### 7 DIMENSIONS SCORE BREAKDOWN")
     dim_cols = st.columns(7)
