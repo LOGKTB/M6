@@ -24,16 +24,14 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS จัดระเบียบพื้นที่หน้าจอ ให้เต็มความกว้างขยายสุด ไม่ล้นจอ
+# Custom CSS ตกแต่ง Modern Light Theme
 st.markdown("""
     <style>
-    /* Clean Light Theme Global */
     .stApp, [data-testid="stSidebar"], [data-testid="stHeader"] {
         background-color: #F8FAFC !important;
         color: #0F172A !important;
     }
     
-    /* ขยายพื้นที่หน้าจอให้กว้างสุด ป้องกันคอลัมน์เบียดตกขอบ */
     .main .block-container {
         max-width: 98% !important;
         padding-left: 1rem !important;
@@ -41,24 +39,32 @@ st.markdown("""
         padding-top: 1rem !important;
     }
     
-    /* Native Container Card Style (Light) */
+    /* Native Container Card Style */
     [data-testid="stVerticalBlockBorderWrapper"] {
         background-color: #FFFFFF !important;
         border: 1px solid #E2E8F0 !important;
         border-radius: 12px !important;
-        padding: 6px 4px !important;
+        padding: 10px 6px !important;
         box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
     }
     
-    /* Badges */
-    .badge-excellent { background-color: #DCFCE7; color: #15803D; border: 1px solid #86EFAC; padding: 2px 5px; border-radius: 10px; font-weight: bold; font-size: 8px; }
-    .badge-good { background-color: #DBEAFE; color: #1D4ED8; border: 1px solid #93C5FD; padding: 2px 5px; border-radius: 10px; font-weight: bold; font-size: 8px; }
-    .badge-warn { background-color: #FEF3C7; color: #B45309; border: 1px solid #FCD34D; padding: 2px 5px; border-radius: 10px; font-weight: bold; font-size: 8px; }
-    .badge-danger { background-color: #FEE2E2; color: #B91C1C; border: 1px solid #FCA5A5; padding: 2px 5px; border-radius: 10px; font-weight: bold; font-size: 8px; }
+    /* Pure SVG Donut Ring Styling (จัดกึ่งกลาง 100% ไม่ตกขอบ) */
+    .svg-donut-box {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 6px 0;
+    }
     
-    .star-rating { font-size: 10px; color: #D97706; letter-spacing: 0.5px; }
-    .metric-value { font-size: 16px; font-weight: bold; color: #0F172A; }
-    .metric-label { font-size: 10px; color: #64748B; }
+    /* Badges */
+    .badge-excellent { background-color: #DCFCE7; color: #15803D; border: 1px solid #86EFAC; padding: 2px 6px; border-radius: 10px; font-weight: bold; font-size: 9px; }
+    .badge-good { background-color: #DBEAFE; color: #1D4ED8; border: 1px solid #93C5FD; padding: 2px 6px; border-radius: 10px; font-weight: bold; font-size: 9px; }
+    .badge-warn { background-color: #FEF3C7; color: #B45309; border: 1px solid #FCD34D; padding: 2px 6px; border-radius: 10px; font-weight: bold; font-size: 9px; }
+    .badge-danger { background-color: #FEE2E2; color: #B91C1C; border: 1px solid #FCA5A5; padding: 2px 6px; border-radius: 10px; font-weight: bold; font-size: 9px; }
+    
+    .star-rating { font-size: 11px; color: #D97706; letter-spacing: 0.5px; }
+    .metric-value { font-size: 18px; font-weight: bold; color: #0F172A; }
+    .metric-label { font-size: 11px; color: #64748B; }
 
     /* Stat Card สำหรับ Fair Value Assessment */
     .fv-card {
@@ -84,28 +90,20 @@ def render_stars(score_100):
     stars = max(1, min(5, stars))
     return "★" * stars + "☆" * (5 - stars)
 
-def create_responsive_donut(score, color_hex="#16A34A", chart_height=70):
-    """สร้าง Donut Chart ขนาดพอดีกล่อง ไร้ระยะขอบเกิน"""
-    fig = go.Figure(data=[go.Pie(
-        labels=['Score', 'Remaining'],
-        values=[score, max(100 - score, 0)],
-        hole=0.72,
-        marker_colors=[color_hex, "#E2E8F0"],
-        textinfo='none',
-        hoverinfo='none'
-    )])
-    fig.update_layout(
-        showlegend=False,
-        margin=dict(t=0, b=0, l=0, r=0),
-        height=chart_height,
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
-        annotations=[dict(
-            text=f"<b style='font-size:12px;color:#0F172A;'>{score:.0f}</b><br><span style='font-size:7px;color:#64748B;'>/100</span>",
-            x=0.5, y=0.5, showarrow=False
-        )]
-    )
-    return fig
+def render_svg_donut(score, color_hex="#16A34A", size=60):
+    """สร้าง SVG Donut Ring พอดีกึ่งกลางการ์ดแบบ Pixel-Perfect ไม่ตกขอบ"""
+    stroke_dasharray = f"{score}, 100"
+    return f"""
+    <div class="svg-donut-box">
+        <svg width="{size}" height="{size}" viewBox="0 0 42 42">
+            <circle cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#E2E8F0" stroke-width="4"></circle>
+            <circle cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="{color_hex}" stroke-width="4"
+                    stroke-dasharray="{stroke_dasharray}" stroke-dashoffset="25" stroke-linecap="round"></circle>
+            <text x="50%" y="46%" font-size="9" font-weight="bold" fill="#0F172A" text-anchor="middle" dominant-baseline="middle">{score:.0f}</text>
+            <text x="50%" y="64%" font-size="4" fill="#64748B" text-anchor="middle" dominant-baseline="middle">/100</text>
+        </svg>
+    </div>
+    """
 
 def create_gauge_meter(score):
     fig = go.Figure(go.Indicator(
@@ -330,10 +328,9 @@ if "Overview" in selected_tab:
     st.markdown("<h2 style='color:#0F172A;'>OVERVIEW DASHBOARD</h2>", unsafe_allow_html=True)
     st.caption("AI-Powered Investment Decision Support System")
     
-    # 📌 ปรับสัดส่วนคอลัมน์ [2.5, 5.5, 4.0] ไม่ให้คอลัมน์ขวาสุดโดนดันตกขอบ
     col_left, col_mid, col_right = st.columns([2.5, 5.5, 4.0])
     
-    # --- LEFT COLUMN (Panel ซ้ายราคาหุ้น) ---
+    # --- LEFT COLUMN ---
     with col_left:
         with st.container(border=True):
             st.markdown(f"""
@@ -363,10 +360,10 @@ if "Overview" in selected_tab:
                 </div>
             """, unsafe_allow_html=True)
 
-    # --- MIDDLE COLUMN (Panel กลางครอบ 6 โมดูล) ---
+    # --- MIDDLE COLUMN (6 โมดูลย่อยกึ่งกลาง พอดีขอบ 100%) ---
     with col_mid:
         with st.container(border=True):
-            st.markdown("<h5 style='margin-bottom:10px; color:#0F172A;'>INVESTMENT DECISION OVERVIEW</h5>", unsafe_allow_html=True)
+            st.markdown("<h5 style='margin-bottom:12px; color:#0F172A;'>INVESTMENT DECISION OVERVIEW</h5>", unsafe_allow_html=True)
             
             mos_class = "badge-excellent" if calc['mos_pct'] > 0 else "badge-danger"
             mos_label = "UNDERVALUED" if calc['mos_pct'] > 0 else "OVERVALUED"
@@ -388,12 +385,12 @@ if "Overview" in selected_tab:
                 with cols[idx]:
                     with st.container(border=True):
                         st.markdown(f"<div style='font-size:8px; font-weight:bold; color:#64748B; text-align:center;'>{title}</div>", unsafe_allow_html=True)
-                        st.plotly_chart(create_responsive_donut(score, color, chart_height=70), use_container_width=True, config={'displayModeBar': False})
+                        st.markdown(render_svg_donut(score, color, size=56), unsafe_allow_html=True)
                         st.markdown(f"<div class='star-rating' style='text-align:center;'>{render_stars(score)}</div>", unsafe_allow_html=True)
-                        st.markdown(f"<div style='text-align:center;'><span class='{badge_cls}'>{badge_txt}</span></div>", unsafe_allow_html=True)
-                        st.markdown(f"<div style='font-size:8px; color:#64748B; text-align:center; margin-top:2px;'>{desc}</div>", unsafe_allow_html=True)
+                        st.markdown(f"<div style='text-align:center; margin-top:2px;'><span class='{badge_cls}'>{badge_txt}</span></div>", unsafe_allow_html=True)
+                        st.markdown(f"<div style='font-size:8px; color:#64748B; text-align:center; margin-top:3px;'>{desc}</div>", unsafe_allow_html=True)
 
-    # --- RIGHT COLUMN (Panel ขวาครอบ AI Summary กว้างพอดีกล่อง) ---
+    # --- RIGHT COLUMN ---
     with col_right:
         with st.container(border=True):
             st.markdown("<h5 style='margin-bottom:10px; color:#0F172A; text-align:center;'>AI INVESTMENT SUMMARY</h5>", unsafe_allow_html=True)
@@ -445,7 +442,7 @@ elif "Company Health" in selected_tab:
     with col1:
         with st.container(border=True):
             st.markdown(f"<div style='font-size:12px; font-weight:bold; color:#64748B; text-align:center;'>01 OVERALL HEALTH SCORE</div>", unsafe_allow_html=True)
-            st.plotly_chart(create_responsive_donut(calc["m1_score"], "#16A34A", chart_height=100), use_container_width=True, config={'displayModeBar': False})
+            st.markdown(render_svg_donut(calc["m1_score"], "#16A34A", size=85), unsafe_allow_html=True)
             st.markdown(f"<div class='star-rating' style='text-align:center;'>{render_stars(calc['m1_score'])}</div>", unsafe_allow_html=True)
             st.markdown(f"<h3 style='text-align:center; color:#16A34A;'>SCORE {calc['m1_score']} / 100</h3>", unsafe_allow_html=True)
 
@@ -460,9 +457,9 @@ elif "Company Health" in selected_tab:
         with dim_cols[idx]:
             with st.container(border=True):
                 st.markdown(f"<div style='font-size:8px; font-weight:bold; color:#64748B; text-align:center;'>0{idx+1} {dim['name']}</div>", unsafe_allow_html=True)
-                st.plotly_chart(create_responsive_donut(round(dim["score"]), "#16A34A", chart_height=65), use_container_width=True, config={'displayModeBar': False})
+                st.markdown(render_svg_donut(round(dim["score"]), "#16A34A", size=50), unsafe_allow_html=True)
                 st.markdown(f"<div class='star-rating' style='text-align:center;'>{render_stars(dim['score'])}</div>", unsafe_allow_html=True)
-                st.markdown(f"<div style='text-align:center;'><span class='badge-excellent'>W: {dim['w']}</span></div>", unsafe_allow_html=True)
+                st.markdown(f"<div style='text-align:center; margin-top:2px;'><span class='badge-excellent'>W: {dim['w']}</span></div>", unsafe_allow_html=True)
 
     st.divider()
     st.markdown("<h5 style='color:#0F172A;'>📋 FINANCIAL STATEMENT HISTORY & RATIOS</h5>", unsafe_allow_html=True)
