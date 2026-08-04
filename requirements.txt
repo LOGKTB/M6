@@ -2,3 +2,27 @@ streamlit
 pandas
 numpy
 plotly
+import yfinance as yf
+
+@st.cache_data(ttl=3600) # แคชข้อมูลไว้ 1 ชั่วโมงเพื่อความเร็ว
+def get_real_financial_data(symbol):
+    # ตลาดหลักทรัพย์แห่งประเทศไทยใน Yahoo Finance จะลงท้ายด้วย .BK เช่น ADVANC.BK
+    ticker = yf.Ticker(f"{symbol}.BK")
+    info = ticker.info
+    
+    # ดึงราคาและข้อมูลสถิติสด
+    current_price = info.get('currentPrice') or info.get('previousClose', 0)
+    mcap = info.get('marketCap', 0)
+    pe = info.get('trailingPE', 0)
+    pb = info.get('priceToBook', 0)
+    div_yield = info.get('dividendYield', 0) * 100 if info.get('dividendYield') else 0
+    eps = info.get('trailingEps', 0)
+    
+    return {
+        "price": current_price,
+        "mcap": f"{mcap / 1e6:,.0f} MB",
+        "pe": pe,
+        "pb": pb,
+        "div": round(div_yield, 2),
+        "eps": eps
+    }
