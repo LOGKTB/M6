@@ -24,7 +24,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS จัดการ Dark Mode 100%, แก้ตารางสีขาว, และทำ Stat Cards ในหน้า Fair Value
+# Custom CSS สำหรับ Dark Theme แบบไร้รอยต่อ และบังคับตารางงบเป็นสีมืด
 st.markdown("""
     <style>
     /* Dark Theme Global & Sidebar */
@@ -38,92 +38,34 @@ st.markdown("""
         background-color: #101625 !important;
         border: 1px solid #1E293B !important;
         border-radius: 12px !important;
-        padding: 16px !important;
+        padding: 12px !important;
     }
-    
-    /* Grid 3x2 สำหรับ 6 โมดูล */
-    .modules-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 12px;
-        margin-top: 10px;
-    }
-    
-    /* การ์ดย่อย 6 ใบ */
-    .module-card-inner {
-        background-color: #172033;
-        border: 1px solid #232D42;
-        border-radius: 10px;
-        padding: 12px 8px;
-        text-align: center;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: space-between;
-        min-height: 200px;
-    }
-    
-    /* Donut Ring */
-    .donut-container {
-        position: relative;
-        width: 65px;
-        height: 65px;
-        margin: 4px auto;
-    }
-    
-    .donut-ring {
-        width: 100%;
-        height: 100%;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    .donut-inner {
-        width: 48px;
-        height: 48px;
-        background-color: #172033;
-        border-radius: 50%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    .donut-score { font-size: 15px; font-weight: bold; color: #FFFFFF; line-height: 1; }
-    .donut-sub { font-size: 8px; color: #64748B; margin-top: 1px; }
     
     /* Badges */
-    .badge-excellent { background-color: rgba(16, 185, 129, 0.12); color: #10B981; border: 1px solid #10B981; padding: 2px 8px; border-radius: 12px; font-weight: bold; font-size: 9px; margin-top: 3px; }
-    .badge-good { background-color: rgba(59, 130, 246, 0.12); color: #3B82F6; border: 1px solid #3B82F6; padding: 2px 8px; border-radius: 12px; font-weight: bold; font-size: 9px; margin-top: 3px; }
-    .badge-warn { background-color: rgba(245, 158, 11, 0.12); color: #F59E0B; border: 1px solid #F59E0B; padding: 2px 8px; border-radius: 12px; font-weight: bold; font-size: 9px; margin-top: 3px; }
-    .badge-danger { background-color: rgba(239, 68, 68, 0.12); color: #EF4444; border: 1px solid #EF4444; padding: 2px 8px; border-radius: 12px; font-weight: bold; font-size: 9px; margin-top: 3px; }
+    .badge-excellent { background-color: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid #10B981; padding: 2px 8px; border-radius: 12px; font-weight: bold; font-size: 10px; }
+    .badge-good { background-color: rgba(59, 130, 246, 0.15); color: #3B82F6; border: 1px solid #3B82F6; padding: 2px 8px; border-radius: 12px; font-weight: bold; font-size: 10px; }
+    .badge-warn { background-color: rgba(245, 158, 11, 0.15); color: #F59E0B; border: 1px solid #F59E0B; padding: 2px 8px; border-radius: 12px; font-weight: bold; font-size: 10px; }
+    .badge-danger { background-color: rgba(239, 68, 68, 0.15); color: #EF4444; border: 1px solid #EF4444; padding: 2px 8px; border-radius: 12px; font-weight: bold; font-size: 10px; }
     
-    .star-rating { font-size: 12px; color: #F59E0B; letter-spacing: 1px; margin-top: 2px; }
-    .card-title { font-size: 10px; font-weight: 700; color: #94A3B8; letter-spacing: 0.5px; text-transform: uppercase; }
-    .card-desc { font-size: 9px; color: #64748B; margin-top: 4px; line-height: 1.2; padding: 0 2px; }
-    
+    .star-rating { font-size: 13px; color: #F59E0B; letter-spacing: 1px; }
     .metric-value { font-size: 18px; font-weight: bold; color: #FFFFFF; }
     .metric-label { font-size: 11px; color: #64748B; }
 
-    /* แก้ปัญหาตารางงบการเงินสีขาว ให้เป็น Dark Theme */
-    [data-testid="stDataFrame"], [data-testid="stTable"], table {
+    /* แก้ไขตารางงบการเงิน (DataFrame) จากสีขาวให้เป็น Dark Theme สีเดียวกับระบบ */
+    [data-testid="stDataFrame"], [data-testid="stTable"], .stDataFrame {
         background-color: #101625 !important;
         color: #E2E8F0 !important;
-        border-radius: 8px !important;
     }
     
-    th {
+    div[data-testid="stDataFrame"] div[role="grid"] {
+        background-color: #101625 !important;
+        color: #E2E8F0 !important;
+    }
+    
+    div[data-testid="stDataFrame"] div[role="columnheader"] {
         background-color: #172033 !important;
         color: #94A3B8 !important;
         font-weight: bold !important;
-    }
-    
-    td {
-        background-color: #101625 !important;
-        color: #E2E8F0 !important;
-        border-bottom: 1px solid #1E293B !important;
     }
 
     /* Stat Card สำหรับ Fair Value Assessment */
@@ -136,8 +78,8 @@ st.markdown("""
         margin-bottom: 12px;
     }
     .fv-label { font-size: 11px; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.5px; }
-    .fv-val { font-size: 26px; font-weight: 800; color: #FFFFFF; margin: 6px 0; }
-    .fv-sub { font-size: 12px; font-weight: 600; }
+    .fv-val { font-size: 24px; font-weight: 800; color: #FFFFFF; margin: 6px 0; }
+    .fv-sub { font-size: 11px; font-weight: 600; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -149,26 +91,28 @@ def render_stars(score_100):
     stars = max(1, min(5, stars))
     return "★" * stars + "☆" * (5 - stars)
 
-def get_module_card_html(num, title, score, color_hex, badge_text, badge_class, desc_text):
-    stars = render_stars(score)
-    score_deg = int((score / 100) * 360)
-    
-    return f"""
-        <div class='module-card-inner'>
-            <div class='card-title'>{num} {title}</div>
-            <div class='donut-container'>
-                <div class='donut-ring' style='background: conic-gradient({color_hex} 0deg {score_deg}deg, #2A364F {score_deg}deg 360deg);'>
-                    <div class='donut-inner'>
-                        <span class='donut-score'>{score:.0f}</span>
-                        <span class='donut-sub'>/100</span>
-                    </div>
-                </div>
-            </div>
-            <div class='star-rating'>{stars}</div>
-            <div class='{badge_class}'>{badge_text}</div>
-            <div class='card-desc'>{desc_text}</div>
-        </div>
-    """
+def create_plotly_donut(score, color_hex="#10B981"):
+    """สร้าง Donut Chart ด้วย Plotly แท้ ป้องกันปัญหา HTML String หลุด"""
+    fig = go.Figure(data=[go.Pie(
+        labels=['Score', 'Remaining'],
+        values=[score, max(100 - score, 0)],
+        hole=0.75,
+        marker_colors=[color_hex, "#1E293B"],
+        textinfo='none',
+        hoverinfo='none'
+    )])
+    fig.update_layout(
+        showlegend=False,
+        margin=dict(t=0, b=0, l=0, r=0),
+        height=90,
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        annotations=[dict(
+            text=f"<b style='font-size:16px;color:white;'>{score:.0f}</b><br><span style='font-size:8px;color:#64748B;'>/100</span>",
+            x=0.5, y=0.5, showarrow=False
+        )]
+    )
+    return fig
 
 def create_gauge_meter(score):
     fig = go.Figure(go.Indicator(
@@ -395,7 +339,7 @@ if "Overview" in selected_tab:
     
     col_left, col_mid, col_right = st.columns([3.2, 5.6, 3.2])
     
-    # --- LEFT COLUMN (Panel ซ้าย) ---
+    # --- LEFT COLUMN (Panel ซ้ายราคาหุ้น) ---
     with col_left:
         with st.container(border=True):
             st.markdown(f"""
@@ -425,23 +369,35 @@ if "Overview" in selected_tab:
                 </div>
             """, unsafe_allow_html=True)
 
-    # --- MIDDLE COLUMN (Panel กลางครอบ 6 โมดูลสมบูรณ์แบบ ไร้ <div> หลุด) ---
+    # --- MIDDLE COLUMN (Panel กลางครอบ 6 โมดูลสร้างด้วย Native Streamlit Cards) ---
     with col_mid:
         with st.container(border=True):
-            st.markdown("<h5 style='margin-bottom:10px; color:white;'>INVESTMENT DECISION OVERVIEW</h5>", unsafe_allow_html=True)
+            st.markdown("<h5 style='margin-bottom:15px; color:white;'>INVESTMENT DECISION OVERVIEW</h5>", unsafe_allow_html=True)
             
             mos_class = "badge-excellent" if calc['mos_pct'] > 0 else "badge-danger"
             mos_label = "UNDERVALUED" if calc['mos_pct'] > 0 else "OVERVALUED"
             
-            c1 = get_module_card_html("01", "COMPANY HEALTH", calc["m1_score"], "#10B981", "EXCELLENT", "badge-excellent", "Strong financial health & sustainable quality")
-            c2 = get_module_card_html("02", "FAIR VALUE", calc["m2_score"], "#F59E0B", mos_label, mos_class, f"Attractive valuation (MoS {calc['mos_pct']:+.1f}%)")
-            c3 = get_module_card_html("03", "ENTRY TIMING", calc["m3_score"], "#3B82F6", "NEUTRAL", "badge-good", "Wait for better entry point based on technicals")
-            c4 = get_module_card_html("04", "AI PREDICTION", calc["m4_score"], "#8B5CF6", "POSITIVE", "badge-good", "AI forecasts positive price movement in 6-12m")
-            c5 = get_module_card_html("05", "RISK ANALYSIS", calc["m5_score"], "#F97316", "MODERATE", "badge-warn", "Moderate risk level with key factors to monitor")
-            c6 = get_module_card_html("06", "BENCHMARK", calc["m6_score"], "#06B6D4", "OUTPERFORM", "badge-excellent", "Outperforming industry average across metrics")
+            modules = [
+                ("01 COMPANY HEALTH", calc["m1_score"], "#10B981", "EXCELLENT", "badge-excellent", "Strong financial health & quality"),
+                ("02 FAIR VALUE", calc["m2_score"], "#F59E0B", mos_label, mos_class, f"MoS {calc['mos_pct']:+.1f}%"),
+                ("03 ENTRY TIMING", calc["m3_score"], "#3B82F6", "NEUTRAL", "badge-good", "Technical entry timing"),
+                ("04 AI PREDICTION", calc["m4_score"], "#8B5CF6", "POSITIVE", "badge-good", "AI forecast 6-12m"),
+                ("05 RISK ANALYSIS", calc["m5_score"], "#F97316", "MODERATE", "badge-warn", "Moderate risk level"),
+                ("06 BENCHMARK", calc["m6_score"], "#06B6D4", "OUTPERFORM", "badge-excellent", "Industry outperform")
+            ]
             
-            grid_html = f"<div class='modules-grid'>{c1}{c2}{c3}{c4}{c5}{c6}</div>"
-            st.markdown(grid_html, unsafe_allow_html=True)
+            r1_c1, r1_c2, r1_c3 = st.columns(3)
+            r2_c1, r2_c2, r2_c3 = st.columns(3)
+            cols = [r1_c1, r1_c2, r1_c3, r2_c1, r2_c2, r2_c3]
+            
+            for idx, (title, score, color, badge_txt, badge_cls, desc) in enumerate(modules):
+                with cols[idx]:
+                    with st.container(border=True):
+                        st.markdown(f"<div style='font-size:10px; font-weight:bold; color:#94A3B8; text-align:center;'>{title}</div>", unsafe_allow_html=True)
+                        st.plotly_chart(create_plotly_donut(score, color), use_container_width=True, config={'displayModeBar': False})
+                        st.markdown(f"<div class='star-rating' style='text-align:center;'>{render_stars(score)}</div>", unsafe_allow_html=True)
+                        st.markdown(f"<div style='text-align:center;'><span class='{badge_cls}'>{badge_txt}</span></div>", unsafe_allow_html=True)
+                        st.markdown(f"<div style='font-size:9px; color:#64748B; text-align:center; margin-top:4px;'>{desc}</div>", unsafe_allow_html=True)
 
     # --- RIGHT COLUMN (Panel ขวาครอบ AI Summary) ---
     with col_right:
@@ -493,7 +449,11 @@ elif "Company Health" in selected_tab:
     
     col1, col2 = st.columns([4, 8])
     with col1:
-        st.markdown(get_module_card_html("01", "OVERALL HEALTH SCORE", calc["m1_score"], "#10B981", f"SCORE {calc['m1_score']}", "badge-excellent", "Strong financial health"), unsafe_allow_html=True)
+        with st.container(border=True):
+            st.markdown(f"<div style='font-size:12px; font-weight:bold; color:#94A3B8; text-align:center;'>01 OVERALL HEALTH SCORE</div>", unsafe_allow_html=True)
+            st.plotly_chart(create_plotly_donut(calc["m1_score"], "#10B981"), use_container_width=True, config={'displayModeBar': False})
+            st.markdown(f"<div class='star-rating' style='text-align:center;'>{render_stars(calc['m1_score'])}</div>", unsafe_allow_html=True)
+            st.markdown(f"<h3 style='text-align:center; color:#10B981;'>SCORE {calc['m1_score']} / 100</h3>", unsafe_allow_html=True)
 
     with col2:
         with st.container(border=True):
@@ -504,14 +464,18 @@ elif "Company Health" in selected_tab:
     dim_cols = st.columns(7)
     for idx, dim in enumerate(calc["m1_dims"]):
         with dim_cols[idx]:
-            st.markdown(get_module_card_html(f"0{idx+1}", dim["name"], round(dim["score"]), "#10B981", f"W: {dim['w']}", "badge-excellent", ""), unsafe_allow_html=True)
+            with st.container(border=True):
+                st.markdown(f"<div style='font-size:9px; font-weight:bold; color:#94A3B8; text-align:center;'>0{idx+1} {dim['name']}</div>", unsafe_allow_html=True)
+                st.plotly_chart(create_plotly_donut(round(dim["score"]), "#10B981"), use_container_width=True, config={'displayModeBar': False})
+                st.markdown(f"<div class='star-rating' style='text-align:center;'>{render_stars(dim['score'])}</div>", unsafe_allow_html=True)
+                st.markdown(f"<div style='text-align:center;'><span class='badge-excellent'>W: {dim['w']}</span></div>", unsafe_allow_html=True)
 
     st.divider()
     st.markdown("##### 📋 FINANCIAL STATEMENT HISTORY & RATIOS")
     st.dataframe(stock_raw["history_table"], use_container_width=True, hide_index=True)
 
 # ==========================================
-# 8. TAB 3: FAIR VALUE ASSESSMENT (ปรับเปลี่ยนเป็น Stat Cards สีมืดตัวหนังสือสว่าง)
+# 8. TAB 3: FAIR VALUE ASSESSMENT
 # ==========================================
 elif "Fair Value" in selected_tab:
     st.markdown(f"## FAIR VALUE ASSESSMENT ({selected_symbol})")
