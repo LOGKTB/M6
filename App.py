@@ -15,7 +15,7 @@ import pandas as pd
 import numpy as np
 
 # ==========================================
-# 1. SYSTEM CONFIG & DARK THEME CSS
+# 1. SYSTEM CONFIG & DARK THEME CSS OVERRIDE
 # ==========================================
 st.set_page_config(
     page_title="AI Investment Decision Support System",
@@ -24,7 +24,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS สำหรับ Dark Theme แบบไร้รอยต่อ และแก้ปัญหาตารางสีขาว
+# Custom CSS จัดการ Dark Mode 100%, แก้ตารางสีขาว, และทำ Stat Cards ในหน้า Fair Value
 st.markdown("""
     <style>
     /* Dark Theme Global & Sidebar */
@@ -38,7 +38,7 @@ st.markdown("""
         background-color: #101625 !important;
         border: 1px solid #1E293B !important;
         border-radius: 12px !important;
-        padding: 12px !important;
+        padding: 16px !important;
     }
     
     /* Grid 3x2 สำหรับ 6 โมดูล */
@@ -60,14 +60,14 @@ st.markdown("""
         flex-direction: column;
         align-items: center;
         justify-content: space-between;
-        min-height: 210px;
+        min-height: 200px;
     }
     
     /* Donut Ring */
     .donut-container {
         position: relative;
-        width: 68px;
-        height: 68px;
+        width: 65px;
+        height: 65px;
         margin: 4px auto;
     }
     
@@ -81,8 +81,8 @@ st.markdown("""
     }
     
     .donut-inner {
-        width: 50px;
-        height: 50px;
+        width: 48px;
+        height: 48px;
         background-color: #172033;
         border-radius: 50%;
         display: flex;
@@ -107,11 +107,37 @@ st.markdown("""
     .metric-value { font-size: 18px; font-weight: bold; color: #FFFFFF; }
     .metric-label { font-size: 11px; color: #64748B; }
 
-    /* ปรับปรุงสไตล์ตาราง Dataframe ให้เป็น Dark Mode */
-    [data-testid="stDataFrame"] {
+    /* แก้ปัญหาตารางงบการเงินสีขาว ให้เป็น Dark Theme */
+    [data-testid="stDataFrame"], [data-testid="stTable"], table {
         background-color: #101625 !important;
         color: #E2E8F0 !important;
+        border-radius: 8px !important;
     }
+    
+    th {
+        background-color: #172033 !important;
+        color: #94A3B8 !important;
+        font-weight: bold !important;
+    }
+    
+    td {
+        background-color: #101625 !important;
+        color: #E2E8F0 !important;
+        border-bottom: 1px solid #1E293B !important;
+    }
+
+    /* Stat Card สำหรับ Fair Value Assessment */
+    .fv-card {
+        background-color: #172033;
+        border: 1px solid #232D42;
+        border-radius: 10px;
+        padding: 16px;
+        text-align: center;
+        margin-bottom: 12px;
+    }
+    .fv-label { font-size: 11px; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.5px; }
+    .fv-val { font-size: 26px; font-weight: 800; color: #FFFFFF; margin: 6px 0; }
+    .fv-sub { font-size: 12px; font-weight: 600; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -369,7 +395,7 @@ if "Overview" in selected_tab:
     
     col_left, col_mid, col_right = st.columns([3.2, 5.6, 3.2])
     
-    # --- LEFT COLUMN (Panel ซ้ายราคาหุ้น) ---
+    # --- LEFT COLUMN (Panel ซ้าย) ---
     with col_left:
         with st.container(border=True):
             st.markdown(f"""
@@ -399,7 +425,7 @@ if "Overview" in selected_tab:
                 </div>
             """, unsafe_allow_html=True)
 
-    # --- MIDDLE COLUMN (Panel กลางครอบ 6 โมดูล ยึดด้วย st.container(border=True)) ---
+    # --- MIDDLE COLUMN (Panel กลางครอบ 6 โมดูลสมบูรณ์แบบ ไร้ <div> หลุด) ---
     with col_mid:
         with st.container(border=True):
             st.markdown("<h5 style='margin-bottom:10px; color:white;'>INVESTMENT DECISION OVERVIEW</h5>", unsafe_allow_html=True)
@@ -407,26 +433,17 @@ if "Overview" in selected_tab:
             mos_class = "badge-excellent" if calc['mos_pct'] > 0 else "badge-danger"
             mos_label = "UNDERVALUED" if calc['mos_pct'] > 0 else "OVERVALUED"
             
-            c1_html = get_module_card_html("01", "COMPANY HEALTH", calc["m1_score"], "#10B981", "EXCELLENT", "badge-excellent", "Strong financial health & sustainable quality")
-            c2_html = get_module_card_html("02", "FAIR VALUE", calc["m2_score"], "#F59E0B", mos_label, mos_class, f"Attractive valuation (MoS {calc['mos_pct']:+.1f}%)")
-            c3_html = get_module_card_html("03", "ENTRY TIMING", calc["m3_score"], "#3B82F6", "NEUTRAL", "badge-good", "Wait for better entry point based on technicals")
-            c4_html = get_module_card_html("04", "AI PREDICTION", calc["m4_score"], "#8B5CF6", "POSITIVE", "badge-good", "AI forecasts positive price movement in 6-12m")
-            c5_html = get_module_card_html("05", "RISK ANALYSIS", calc["m5_score"], "#F97316", "MODERATE", "badge-warn", "Moderate risk level with key factors to monitor")
-            c6_html = get_module_card_html("06", "BENCHMARK", calc["m6_score"], "#06B6D4", "OUTPERFORM", "badge-excellent", "Outperforming industry average across metrics")
+            c1 = get_module_card_html("01", "COMPANY HEALTH", calc["m1_score"], "#10B981", "EXCELLENT", "badge-excellent", "Strong financial health & sustainable quality")
+            c2 = get_module_card_html("02", "FAIR VALUE", calc["m2_score"], "#F59E0B", mos_label, mos_class, f"Attractive valuation (MoS {calc['mos_pct']:+.1f}%)")
+            c3 = get_module_card_html("03", "ENTRY TIMING", calc["m3_score"], "#3B82F6", "NEUTRAL", "badge-good", "Wait for better entry point based on technicals")
+            c4 = get_module_card_html("04", "AI PREDICTION", calc["m4_score"], "#8B5CF6", "POSITIVE", "badge-good", "AI forecasts positive price movement in 6-12m")
+            c5 = get_module_card_html("05", "RISK ANALYSIS", calc["m5_score"], "#F97316", "MODERATE", "badge-warn", "Moderate risk level with key factors to monitor")
+            c6 = get_module_card_html("06", "BENCHMARK", calc["m6_score"], "#06B6D4", "OUTPERFORM", "badge-excellent", "Outperforming industry average across metrics")
             
-            middle_html = f"""
-                <div class='modules-grid'>
-                    {c1_html}
-                    {c2_html}
-                    {c3_html}
-                    {c4_html}
-                    {c5_html}
-                    {c6_html}
-                </div>
-            """
-            st.markdown(middle_html, unsafe_allow_html=True)
+            grid_html = f"<div class='modules-grid'>{c1}{c2}{c3}{c4}{c5}{c6}</div>"
+            st.markdown(grid_html, unsafe_allow_html=True)
 
-    # --- RIGHT COLUMN (Panel ขวาครอบ AI Summary ยึดด้วย st.container(border=True)) ---
+    # --- RIGHT COLUMN (Panel ขวาครอบ AI Summary) ---
     with col_right:
         with st.container(border=True):
             st.markdown("<h5 style='margin-bottom:10px; color:white; text-align:center;'>AI INVESTMENT SUMMARY</h5>", unsafe_allow_html=True)
@@ -454,7 +471,7 @@ if "Overview" in selected_tab:
             st.markdown(f"📈 <span class='metric-label'>Revenue Growth</span><div class='metric-value' style='color:#10B981;'>{fin['RevGrowth']:+.1f}%</div><span class='metric-label'>YoY 2024</span>", unsafe_allow_html=True)
     with h_col2:
         with st.container(border=True):
-            st.markdown(f"💰 <span class='metric-label'>Net Profit Growth</span><div class='metric-value' style='color:#10B981;'>{fin['RevGrowth']:+.1f}%</div><span class='metric-label'>YoY 2024</span>", unsafe_allow_html=True)
+            st.markdown(f"💰 <span class='metric-label'>Net Profit Growth</span><div class='metric-value' style='color:#10B981;'>{fin['NetGrowth']:+.1f}%</div><span class='metric-label'>YoY 2024</span>", unsafe_allow_html=True)
     with h_col3:
         with st.container(border=True):
             st.markdown(f"🔄 <span class='metric-label'>ROE (TTM)</span><div class='metric-value' style='color:#3B82F6;'>{fin['ROE']:.1f}%</div><span class='metric-label'>High Efficiency</span>", unsafe_allow_html=True)
@@ -494,27 +511,34 @@ elif "Company Health" in selected_tab:
     st.dataframe(stock_raw["history_table"], use_container_width=True, hide_index=True)
 
 # ==========================================
-# 8. TAB 3: FAIR VALUE ASSESSMENT
+# 8. TAB 3: FAIR VALUE ASSESSMENT (ปรับเปลี่ยนเป็น Stat Cards สีมืดตัวหนังสือสว่าง)
 # ==========================================
 elif "Fair Value" in selected_tab:
     st.markdown(f"## FAIR VALUE ASSESSMENT ({selected_symbol})")
     
     col_f1, col_f2, col_f3, col_f4 = st.columns(4)
+    status_label = "UNDERVALUED" if calc['mos_pct'] > 0 else "OVERVALUED"
+    status_color = "#10B981" if calc['mos_pct'] > 0 else "#EF4444"
+    
     with col_f1:
-        st.metric("CURRENT MARKET PRICE", f"{stock_raw['price']:.2f} THB")
+        st.markdown(f"<div class='fv-card'><div class='fv-label'>CURRENT MARKET PRICE</div><div class='fv-val'>{stock_raw['price']:.2f} <span style='font-size:14px;'>THB</span></div></div>", unsafe_allow_html=True)
     with col_f2:
-        st.metric("ESTIMATED FAIR VALUE (BASE)", f"{calc['fair_base']:.2f} THB")
+        st.markdown(f"<div class='fv-card'><div class='fv-label'>ESTIMATED FAIR VALUE (BASE)</div><div class='fv-val' style='color:#3B82F6;'>{calc['fair_base']:.2f} <span style='font-size:14px;'>THB</span></div></div>", unsafe_allow_html=True)
     with col_f3:
-        st.metric("MARGIN OF SAFETY", f"{calc['mos_pct']:+.1f}%")
+        st.markdown(f"<div class='fv-card'><div class='fv-label'>MARGIN OF SAFETY</div><div class='fv-val' style='color:{status_color};'>{calc['mos_pct']:+.1f}%</div></div>", unsafe_allow_html=True)
     with col_f4:
-        st.metric("VALUATION STATUS", "UNDERVALUED" if calc['mos_pct'] > 0 else "OVERVALUED")
+        st.markdown(f"<div class='fv-card'><div class='fv-label'>VALUATION STATUS</div><div class='fv-val' style='color:{status_color}; font-size:22px;'>{status_label}</div></div>", unsafe_allow_html=True)
 
     st.divider()
     st.markdown("##### INTRINSIC VALUE RANGE (DCF SCENARIOS)")
     sc_col1, sc_col2, sc_col3 = st.columns(3)
-    sc_col1.metric("Bear Case", f"{calc['fair_bear']:.2f} THB", "Conservative Growth")
-    sc_col2.metric("Base Case (Target)", f"{calc['fair_base']:.2f} THB", "Base Growth")
-    sc_col3.metric("Bull Case", f"{calc['fair_bull']:.2f} THB", "Optimistic Growth")
+    
+    with sc_col1:
+        st.markdown(f"<div class='fv-card'><div class='fv-label'>Bear Case</div><div class='fv-val' style='color:#F59E0B;'>{calc['fair_bear']:.2f} THB</div><div class='fv-sub' style='color:#64748B;'>Conservative Growth</div></div>", unsafe_allow_html=True)
+    with sc_col2:
+        st.markdown(f"<div class='fv-card'><div class='fv-label'>Base Case (Target)</div><div class='fv-val' style='color:#10B981;'>{calc['fair_base']:.2f} THB</div><div class='fv-sub' style='color:#10B981;'>Base Growth</div></div>", unsafe_allow_html=True)
+    with sc_col3:
+        st.markdown(f"<div class='fv-card'><div class='fv-label'>Bull Case</div><div class='fv-val' style='color:#3B82F6;'>{calc['fair_bull']:.2f} THB</div><div class='fv-sub' style='color:#3B82F6;'>Optimistic Growth</div></div>", unsafe_allow_html=True)
 
 else:
     st.info("โมดูลอื่นๆ พร้อมขยายระบบเชื่อมต่อข้อมูลเชิงลึกในลำดับถัดไปครับ")
