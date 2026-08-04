@@ -24,7 +24,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS เปลี่ยนเป็นธีมสว่างสไตล์ Modern Clean Light Theme
+# Custom CSS จัดระเบียบพื้นที่หน้าจอ ให้เต็มความกว้างขยายสุด ไม่ล้นจอ
 st.markdown("""
     <style>
     /* Clean Light Theme Global */
@@ -33,38 +33,46 @@ st.markdown("""
         color: #0F172A !important;
     }
     
+    /* ขยายพื้นที่หน้าจอให้กว้างสุด ป้องกันคอลัมน์เบียดตกขอบ */
+    .main .block-container {
+        max-width: 98% !important;
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+        padding-top: 1rem !important;
+    }
+    
     /* Native Container Card Style (Light) */
     [data-testid="stVerticalBlockBorderWrapper"] {
         background-color: #FFFFFF !important;
         border: 1px solid #E2E8F0 !important;
         border-radius: 12px !important;
-        padding: 8px 4px !important;
+        padding: 6px 4px !important;
         box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
     }
     
     /* Badges */
-    .badge-excellent { background-color: #DCFCE7; color: #15803D; border: 1px solid #86EFAC; padding: 2px 6px; border-radius: 12px; font-weight: bold; font-size: 9px; }
-    .badge-good { background-color: #DBEAFE; color: #1D4ED8; border: 1px solid #93C5FD; padding: 2px 6px; border-radius: 12px; font-weight: bold; font-size: 9px; }
-    .badge-warn { background-color: #FEF3C7; color: #B45309; border: 1px solid #FCD34D; padding: 2px 6px; border-radius: 12px; font-weight: bold; font-size: 9px; }
-    .badge-danger { background-color: #FEE2E2; color: #B91C1C; border: 1px solid #FCA5A5; padding: 2px 6px; border-radius: 12px; font-weight: bold; font-size: 9px; }
+    .badge-excellent { background-color: #DCFCE7; color: #15803D; border: 1px solid #86EFAC; padding: 2px 5px; border-radius: 10px; font-weight: bold; font-size: 8px; }
+    .badge-good { background-color: #DBEAFE; color: #1D4ED8; border: 1px solid #93C5FD; padding: 2px 5px; border-radius: 10px; font-weight: bold; font-size: 8px; }
+    .badge-warn { background-color: #FEF3C7; color: #B45309; border: 1px solid #FCD34D; padding: 2px 5px; border-radius: 10px; font-weight: bold; font-size: 8px; }
+    .badge-danger { background-color: #FEE2E2; color: #B91C1C; border: 1px solid #FCA5A5; padding: 2px 5px; border-radius: 10px; font-weight: bold; font-size: 8px; }
     
-    .star-rating { font-size: 11px; color: #D97706; letter-spacing: 0.5px; }
-    .metric-value { font-size: 18px; font-weight: bold; color: #0F172A; }
-    .metric-label { font-size: 11px; color: #64748B; }
+    .star-rating { font-size: 10px; color: #D97706; letter-spacing: 0.5px; }
+    .metric-value { font-size: 16px; font-weight: bold; color: #0F172A; }
+    .metric-label { font-size: 10px; color: #64748B; }
 
     /* Stat Card สำหรับ Fair Value Assessment */
     .fv-card {
         background-color: #FFFFFF;
         border: 1px solid #E2E8F0;
         border-radius: 10px;
-        padding: 16px;
+        padding: 14px;
         text-align: center;
         margin-bottom: 12px;
         box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
-    .fv-label { font-size: 11px; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; }
-    .fv-val { font-size: 24px; font-weight: 800; color: #0F172A; margin: 6px 0; }
-    .fv-sub { font-size: 11px; font-weight: 600; }
+    .fv-label { font-size: 10px; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; }
+    .fv-val { font-size: 22px; font-weight: 800; color: #0F172A; margin: 4px 0; }
+    .fv-sub { font-size: 10px; font-weight: 600; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -76,24 +84,24 @@ def render_stars(score_100):
     stars = max(1, min(5, stars))
     return "★" * stars + "☆" * (5 - stars)
 
-def create_responsive_donut(score, color_hex="#16A34A", chart_height=80):
-    """สร้าง Donut Chart แบบกระชับ Zero-Margin เพื่อป้องกันอาการตกขอบ"""
+def create_responsive_donut(score, color_hex="#16A34A", chart_height=70):
+    """สร้าง Donut Chart ขนาดพอดีกล่อง ไร้ระยะขอบเกิน"""
     fig = go.Figure(data=[go.Pie(
         labels=['Score', 'Remaining'],
         values=[score, max(100 - score, 0)],
-        hole=0.75,
+        hole=0.72,
         marker_colors=[color_hex, "#E2E8F0"],
         textinfo='none',
         hoverinfo='none'
     )])
     fig.update_layout(
         showlegend=False,
-        margin=dict(t=0, b=0, l=0, r=0),  # เซ็ตระยะขอบเป็น 0 ทุกด้าน
+        margin=dict(t=0, b=0, l=0, r=0),
         height=chart_height,
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
         annotations=[dict(
-            text=f"<b style='font-size:13px;color:#0F172A;'>{score:.0f}</b><br><span style='font-size:7px;color:#64748B;'>/100</span>",
+            text=f"<b style='font-size:12px;color:#0F172A;'>{score:.0f}</b><br><span style='font-size:7px;color:#64748B;'>/100</span>",
             x=0.5, y=0.5, showarrow=False
         )]
     )
@@ -103,7 +111,7 @@ def create_gauge_meter(score):
     fig = go.Figure(go.Indicator(
         mode="gauge+number",
         value=score,
-        number={'suffix': "/100", 'font': {'size': 24, 'color': '#0F172A'}},
+        number={'suffix': "/100", 'font': {'size': 22, 'color': '#0F172A'}},
         gauge={
             'axis': {'range': [0, 100], 'tickwidth': 0, 'showticklabels': False},
             'bar': {'color': "#16A34A" if score>=75 else ("#D97706" if score>=55 else "#DC2626")},
@@ -111,7 +119,7 @@ def create_gauge_meter(score):
             'bordercolor': "rgba(0,0,0,0)"
         }
     ))
-    fig.update_layout(height=130, margin=dict(t=15, b=0, l=10, r=10), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+    fig.update_layout(height=120, margin=dict(t=15, b=0, l=10, r=10), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
     return fig
 
 def create_stock_price_chart(dates, prices, color="#16A34A"):
@@ -126,15 +134,15 @@ def create_stock_price_chart(dates, prices, color="#16A34A"):
     ))
     
     fig.update_layout(
-        height=125,
-        margin=dict(t=10, b=20, l=10, r=35),
+        height=115,
+        margin=dict(t=5, b=15, l=5, r=30),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
         xaxis=dict(
             showgrid=False,
             showline=False,
             zeroline=False,
-            tickfont=dict(size=9, color='#64748B'),
+            tickfont=dict(size=8, color='#64748B'),
             nticks=4
         ),
         yaxis=dict(
@@ -143,7 +151,7 @@ def create_stock_price_chart(dates, prices, color="#16A34A"):
             gridcolor='#E2E8F0',
             showline=False,
             zeroline=False,
-            tickfont=dict(size=9, color='#64748B'),
+            tickfont=dict(size=8, color='#64748B'),
             nticks=3
         )
     )
@@ -322,48 +330,49 @@ if "Overview" in selected_tab:
     st.markdown("<h2 style='color:#0F172A;'>OVERVIEW DASHBOARD</h2>", unsafe_allow_html=True)
     st.caption("AI-Powered Investment Decision Support System")
     
-    col_left, col_mid, col_right = st.columns([3.2, 5.6, 3.2])
+    # 📌 ปรับสัดส่วนคอลัมน์ [2.5, 5.5, 4.0] ไม่ให้คอลัมน์ขวาสุดโดนดันตกขอบ
+    col_left, col_mid, col_right = st.columns([2.5, 5.5, 4.0])
     
-    # --- LEFT COLUMN ---
+    # --- LEFT COLUMN (Panel ซ้ายราคาหุ้น) ---
     with col_left:
         with st.container(border=True):
             st.markdown(f"""
-                <div style='font-size:20px; font-weight:bold; color:#0F172A;'>{selected_symbol} ☆</div>
-                <div style='font-size:12px; color:#64748B; margin-bottom:12px;'>{stock_raw['name']}</div>
-                <div style='font-size:28px; font-weight:bold; color:#0F172A;'>{stock_raw['price']:.2f} <span style='font-size:14px;'>THB</span></div>
-                <div style='color:#16A34A; font-size:12px;'>+2.00 (+1.40%) ▲</div>
-                <div style='font-size:10px; color:#64748B; margin-top:2px; margin-bottom:10px;'>Market Closed | 23 May 2025</div>
+                <div style='font-size:18px; font-weight:bold; color:#0F172A;'>{selected_symbol} ☆</div>
+                <div style='font-size:11px; color:#64748B; margin-bottom:8px;'>{stock_raw['name']}</div>
+                <div style='font-size:24px; font-weight:bold; color:#0F172A;'>{stock_raw['price']:.2f} <span style='font-size:12px;'>THB</span></div>
+                <div style='color:#16A34A; font-size:11px;'>+2.00 (+1.40%) ▲</div>
+                <div style='font-size:9px; color:#64748B; margin-top:2px; margin-bottom:8px;'>Market Closed | 23 May 2025</div>
             """, unsafe_allow_html=True)
             
             fig_stock = create_stock_price_chart(stock_raw["dates"], stock_raw["prices_hist"])
             st.plotly_chart(fig_stock, use_container_width=True, config={'displayModeBar': False})
             
             st.markdown(f"""
-                <hr style='border-color:#E2E8F0; margin:15px 0;'>
-                <div style='display:flex; justify-content:space-between; margin-bottom:10px;'>
-                    <div><div class='metric-label'>Market Cap</div><div class='metric-value' style='font-size:13px;'>{stock_raw['mcap']}</div></div>
-                    <div><div class='metric-label'>P/E (TTM)</div><div class='metric-value' style='font-size:13px;'>{stock_raw['pe']}x</div></div>
+                <hr style='border-color:#E2E8F0; margin:10px 0;'>
+                <div style='display:flex; justify-content:space-between; margin-bottom:8px;'>
+                    <div><div class='metric-label'>Market Cap</div><div class='metric-value' style='font-size:12px;'>{stock_raw['mcap']}</div></div>
+                    <div><div class='metric-label'>P/E (TTM)</div><div class='metric-value' style='font-size:12px;'>{stock_raw['pe']}x</div></div>
                 </div>
-                <div style='display:flex; justify-content:space-between; margin-bottom:10px;'>
-                    <div><div class='metric-label'>Sector</div><div class='metric-value' style='font-size:13px;'>{stock_raw['sector']}</div></div>
-                    <div><div class='metric-label'>P/B (TTM)</div><div class='metric-value' style='font-size:13px;'>{stock_raw['pb']}x</div></div>
+                <div style='display:flex; justify-content:space-between; margin-bottom:8px;'>
+                    <div><div class='metric-label'>Sector</div><div class='metric-value' style='font-size:12px;'>{stock_raw['sector']}</div></div>
+                    <div><div class='metric-label'>P/B (TTM)</div><div class='metric-value' style='font-size:12px;'>{stock_raw['pb']}x</div></div>
                 </div>
                 <div style='display:flex; justify-content:space-between;'>
-                    <div><div class='metric-label'>Industry</div><div class='metric-value' style='font-size:13px;'>{stock_raw['industry']}</div></div>
-                    <div><div class='metric-label'>Dividend Yield</div><div class='metric-value' style='font-size:13px;'>{stock_raw['div']}%</div></div>
+                    <div><div class='metric-label'>Industry</div><div class='metric-value' style='font-size:12px;'>{stock_raw['industry']}</div></div>
+                    <div><div class='metric-label'>Dividend Yield</div><div class='metric-value' style='font-size:12px;'>{stock_raw['div']}%</div></div>
                 </div>
             """, unsafe_allow_html=True)
 
-    # --- MIDDLE COLUMN ---
+    # --- MIDDLE COLUMN (Panel กลางครอบ 6 โมดูล) ---
     with col_mid:
         with st.container(border=True):
-            st.markdown("<h5 style='margin-bottom:15px; color:#0F172A;'>INVESTMENT DECISION OVERVIEW</h5>", unsafe_allow_html=True)
+            st.markdown("<h5 style='margin-bottom:10px; color:#0F172A;'>INVESTMENT DECISION OVERVIEW</h5>", unsafe_allow_html=True)
             
             mos_class = "badge-excellent" if calc['mos_pct'] > 0 else "badge-danger"
             mos_label = "UNDERVALUED" if calc['mos_pct'] > 0 else "OVERVALUED"
             
             modules = [
-                ("01 COMPANY HEALTH", calc["m1_score"], "#16A34A", "EXCELLENT", "badge-excellent", "Strong financial health & quality"),
+                ("01 COMPANY HEALTH", calc["m1_score"], "#16A34A", "EXCELLENT", "badge-excellent", "Strong health & quality"),
                 ("02 FAIR VALUE", calc["m2_score"], "#D97706", mos_label, mos_class, f"MoS {calc['mos_pct']:+.1f}%"),
                 ("03 ENTRY TIMING", calc["m3_score"], "#2563EB", "NEUTRAL", "badge-good", "Technical entry timing"),
                 ("04 AI PREDICTION", calc["m4_score"], "#9333EA", "POSITIVE", "badge-good", "AI forecast 6-12m"),
@@ -378,13 +387,13 @@ if "Overview" in selected_tab:
             for idx, (title, score, color, badge_txt, badge_cls, desc) in enumerate(modules):
                 with cols[idx]:
                     with st.container(border=True):
-                        st.markdown(f"<div style='font-size:9px; font-weight:bold; color:#64748B; text-align:center;'>{title}</div>", unsafe_allow_html=True)
-                        st.plotly_chart(create_responsive_donut(score, color, chart_height=80), use_container_width=True, config={'displayModeBar': False})
+                        st.markdown(f"<div style='font-size:8px; font-weight:bold; color:#64748B; text-align:center;'>{title}</div>", unsafe_allow_html=True)
+                        st.plotly_chart(create_responsive_donut(score, color, chart_height=70), use_container_width=True, config={'displayModeBar': False})
                         st.markdown(f"<div class='star-rating' style='text-align:center;'>{render_stars(score)}</div>", unsafe_allow_html=True)
                         st.markdown(f"<div style='text-align:center;'><span class='{badge_cls}'>{badge_txt}</span></div>", unsafe_allow_html=True)
-                        st.markdown(f"<div style='font-size:8px; color:#64748B; text-align:center; margin-top:3px;'>{desc}</div>", unsafe_allow_html=True)
+                        st.markdown(f"<div style='font-size:8px; color:#64748B; text-align:center; margin-top:2px;'>{desc}</div>", unsafe_allow_html=True)
 
-    # --- RIGHT COLUMN ---
+    # --- RIGHT COLUMN (Panel ขวาครอบ AI Summary กว้างพอดีกล่อง) ---
     with col_right:
         with st.container(border=True):
             st.markdown("<h5 style='margin-bottom:10px; color:#0F172A; text-align:center;'>AI INVESTMENT SUMMARY</h5>", unsafe_allow_html=True)
@@ -392,15 +401,15 @@ if "Overview" in selected_tab:
             st.plotly_chart(create_gauge_meter(calc["overall_score"]), use_container_width=True, config={'displayModeBar': False})
             
             st.markdown(f"<div style='color:#64748B; font-size:10px; font-weight:bold; text-align:center; margin-top:-10px;'>OVERALL SCORE</div>", unsafe_allow_html=True)
-            st.markdown(f"<div class='star-rating' style='font-size:18px; text-align:center;'>{render_stars(calc['overall_score'])}</div>", unsafe_allow_html=True)
-            st.markdown(f"<h3 style='color:#16A34A; margin:6px 0; text-align:center;'>{calc['rec_text']}</h3>", unsafe_allow_html=True)
+            st.markdown(f"<div class='star-rating' style='font-size:16px; text-align:center;'>{render_stars(calc['overall_score'])}</div>", unsafe_allow_html=True)
+            st.markdown(f"<h3 style='color:#16A34A; margin:4px 0; text-align:center;'>{calc['rec_text']}</h3>", unsafe_allow_html=True)
             
-            st.markdown(f"<p style='font-size:11px; color:#64748B; line-height:1.4; text-align:center;'>{selected_symbol} shows attractive investment potential with strong fundamentals and solid AI predictions.</p>", unsafe_allow_html=True)
+            st.markdown(f"<p style='font-size:10px; color:#64748B; line-height:1.3; text-align:center;'>{selected_symbol} shows attractive investment potential with strong fundamentals and solid AI predictions.</p>", unsafe_allow_html=True)
             
             st.divider()
-            st.markdown("<div style='color:#64748B; font-size:11px; font-weight:bold; text-align:center;'>RECOMMENDATION</div>", unsafe_allow_html=True)
-            st.markdown(f"<h2 style='color:#16A34A; margin:5px 0; text-align:center;'>🚀 {calc['rec']}</h2>", unsafe_allow_html=True)
-            st.markdown("<div style='text-align:center; font-size:10px; color:#64748B;'>Investment Horizon: LONG TERM (12+ Months)</div>", unsafe_allow_html=True)
+            st.markdown("<div style='color:#64748B; font-size:10px; font-weight:bold; text-align:center;'>RECOMMENDATION</div>", unsafe_allow_html=True)
+            st.markdown(f"<h2 style='color:#16A34A; margin:4px 0; text-align:center;'>🚀 {calc['rec']}</h2>", unsafe_allow_html=True)
+            st.markdown("<div style='text-align:center; font-size:9px; color:#64748B;'>Investment Horizon: LONG TERM (12+ Months)</div>", unsafe_allow_html=True)
 
     # --- BOTTOM ROW ---
     st.markdown("<h5 style='color:#0F172A; margin-top:15px;'>KEY HIGHLIGHTS</h5>", unsafe_allow_html=True)
@@ -436,7 +445,7 @@ elif "Company Health" in selected_tab:
     with col1:
         with st.container(border=True):
             st.markdown(f"<div style='font-size:12px; font-weight:bold; color:#64748B; text-align:center;'>01 OVERALL HEALTH SCORE</div>", unsafe_allow_html=True)
-            st.plotly_chart(create_responsive_donut(calc["m1_score"], "#16A34A", chart_height=110), use_container_width=True, config={'displayModeBar': False})
+            st.plotly_chart(create_responsive_donut(calc["m1_score"], "#16A34A", chart_height=100), use_container_width=True, config={'displayModeBar': False})
             st.markdown(f"<div class='star-rating' style='text-align:center;'>{render_stars(calc['m1_score'])}</div>", unsafe_allow_html=True)
             st.markdown(f"<h3 style='text-align:center; color:#16A34A;'>SCORE {calc['m1_score']} / 100</h3>", unsafe_allow_html=True)
 
@@ -451,7 +460,7 @@ elif "Company Health" in selected_tab:
         with dim_cols[idx]:
             with st.container(border=True):
                 st.markdown(f"<div style='font-size:8px; font-weight:bold; color:#64748B; text-align:center;'>0{idx+1} {dim['name']}</div>", unsafe_allow_html=True)
-                st.plotly_chart(create_responsive_donut(round(dim["score"]), "#16A34A", chart_height=70), use_container_width=True, config={'displayModeBar': False})
+                st.plotly_chart(create_responsive_donut(round(dim["score"]), "#16A34A", chart_height=65), use_container_width=True, config={'displayModeBar': False})
                 st.markdown(f"<div class='star-rating' style='text-align:center;'>{render_stars(dim['score'])}</div>", unsafe_allow_html=True)
                 st.markdown(f"<div style='text-align:center;'><span class='badge-excellent'>W: {dim['w']}</span></div>", unsafe_allow_html=True)
 
