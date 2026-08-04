@@ -24,24 +24,32 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS ตกแต่งสไตล์ Dark Theme และคุมกรอบ Sidebar ให้เป็นสีมืดเข้ากัน
+# Custom CSS สำหรับ Dark Theme แบบไร้รอยต่อ และแก้ปัญหาตารางสีขาว
 st.markdown("""
     <style>
-    /* Dark Theme พื้นหลังหลัก และ Sidebar */
-    .stApp, [data-testid="stSidebar"] {
+    /* Dark Theme Global & Sidebar */
+    .stApp, [data-testid="stSidebar"], [data-testid="stHeader"] {
         background-color: #0A0E1A !important;
         color: #E2E8F0 !important;
     }
     
-    /* ปรับแต่ง Streamlit Container ให้เป็นการ์ดสีมืดขอบมนสวยงาม */
+    /* Native Container Card Style */
     [data-testid="stVerticalBlockBorderWrapper"] {
         background-color: #101625 !important;
         border: 1px solid #1E293B !important;
         border-radius: 12px !important;
-        padding: 10px !important;
+        padding: 12px !important;
     }
     
-    /* 6 โมดูลย่อยภายในกรอบกลาง */
+    /* Grid 3x2 สำหรับ 6 โมดูล */
+    .modules-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-top: 10px;
+    }
+    
+    /* การ์ดย่อย 6 ใบ */
     .module-card-inner {
         background-color: #172033;
         border: 1px solid #232D42;
@@ -52,15 +60,15 @@ st.markdown("""
         flex-direction: column;
         align-items: center;
         justify-content: space-between;
-        min-height: 220px;
+        min-height: 210px;
     }
     
-    /* Donut Ring CSS */
+    /* Donut Ring */
     .donut-container {
         position: relative;
         width: 68px;
         height: 68px;
-        margin: 6px auto;
+        margin: 4px auto;
     }
     
     .donut-ring {
@@ -98,6 +106,12 @@ st.markdown("""
     
     .metric-value { font-size: 18px; font-weight: bold; color: #FFFFFF; }
     .metric-label { font-size: 11px; color: #64748B; }
+
+    /* ปรับปรุงสไตล์ตาราง Dataframe ให้เป็น Dark Mode */
+    [data-testid="stDataFrame"] {
+        background-color: #101625 !important;
+        color: #E2E8F0 !important;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -142,7 +156,7 @@ def create_gauge_meter(score):
             'bordercolor': "rgba(0,0,0,0)"
         }
     ))
-    fig.update_layout(height=135, margin=dict(t=20, b=0, l=10, r=10), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+    fig.update_layout(height=130, margin=dict(t=20, b=0, l=10, r=10), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
     return fig
 
 def create_stock_price_chart(dates, prices, color="#10B981"):
@@ -157,7 +171,7 @@ def create_stock_price_chart(dates, prices, color="#10B981"):
     ))
     
     fig.update_layout(
-        height=130,
+        height=125,
         margin=dict(t=10, b=20, l=10, r=35),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
@@ -440,7 +454,7 @@ if "Overview" in selected_tab:
             st.markdown(f"📈 <span class='metric-label'>Revenue Growth</span><div class='metric-value' style='color:#10B981;'>{fin['RevGrowth']:+.1f}%</div><span class='metric-label'>YoY 2024</span>", unsafe_allow_html=True)
     with h_col2:
         with st.container(border=True):
-            st.markdown(f"💰 <span class='metric-label'>Net Profit Growth</span><div class='metric-value' style='color:#10B981;'>{fin['NetGrowth']:+.1f}%</div><span class='metric-label'>YoY 2024</span>", unsafe_allow_html=True)
+            st.markdown(f"💰 <span class='metric-label'>Net Profit Growth</span><div class='metric-value' style='color:#10B981;'>{fin['RevGrowth']:+.1f}%</div><span class='metric-label'>YoY 2024</span>", unsafe_allow_html=True)
     with h_col3:
         with st.container(border=True):
             st.markdown(f"🔄 <span class='metric-label'>ROE (TTM)</span><div class='metric-value' style='color:#3B82F6;'>{fin['ROE']:.1f}%</div><span class='metric-label'>High Efficiency</span>", unsafe_allow_html=True)
