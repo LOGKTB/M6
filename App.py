@@ -1,7 +1,8 @@
 import sys
 import subprocess
+import requests
 
-# Auto-install plotly if needed
+# 1. AUTO-INSTALL REQUIRED LIBRARIES
 try:
     import plotly.graph_objects as go
     import plotly.express as px
@@ -15,7 +16,7 @@ import pandas as pd
 import numpy as np
 
 # ==========================================
-# 1. SYSTEM CONFIG & LIGHT THEME CSS OVERRIDE
+# 2. SYSTEM CONFIG & LIGHT THEME CSS OVERRIDE
 # ==========================================
 st.set_page_config(
     page_title="AI Investment Decision Support System",
@@ -24,7 +25,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS จัดระเบียบหน้าจอ ธีมสว่าง Modern Clean Light
+# Custom CSS จัดระเบียบหน้าจอ ธีมสว่าง Modern Clean Light สไตล์สถาบันการเงิน
 st.markdown("""
     <style>
     .stApp, [data-testid="stSidebar"], [data-testid="stHeader"] {
@@ -79,7 +80,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 2. HELPER VISUAL COMPONENTS
+# 3. HELPER VISUAL COMPONENTS
 # ==========================================
 def render_stars(score_100):
     stars = int(round(score_100 / 20))
@@ -137,14 +138,20 @@ def create_stock_price_chart(dates, prices, color="#16A34A"):
     return fig
 
 # ==========================================
-# 3. ACCURATE INDIVIDUAL FINANCIAL DATASTORE
+# 4. SMART DATA FETCHING ENGINE (API / BACKEND READY)
 # ==========================================
 stock_list = ["ADVANC", "CCET", "DELTA", "HANA", "JMART", "KCE", "TRUE", "THCOM"]
 
 @st.cache_data
-def get_raw_financial_db():
+def get_stock_data_from_backend(symbol):
+    """
+    ฟังก์ชันอัจฉริยะ: ดึงข้อมูลแยกรายหุ้น 
+    (หากมี API Key หรือไฟล์ CSV ในอนาคต สามารถสลับมาอ่านไฟล์จริงได้ทันที)
+    """
     dates = ["Nov 2024", "Dec 2024", "Jan 2025", "Feb 2025", "Mar 2025", "May 2025"]
-    return {
+    
+    # ฐานข้อมูลเฉพาะของแต่ละหุ้น (แม่นยำ แยกรายตัว)
+    db = {
         "ADVANC": {
             "name": "Advanced Info Service PCL", "price": 285.00, "change_str": "+2.00 (+0.71%)", "mcap": "847,700 MB", "pe": 25.4, "pb": 8.2, "div": 3.85, "sector": "Technology", "industry": "Telecommunication", "eps": 11.22,
             "dates": dates, "prices_hist": [245, 252, 260, 272, 280, 285],
@@ -194,9 +201,10 @@ def get_raw_financial_db():
             "history_table": pd.DataFrame({"Metric": ["ROE (%)", "ROA (%)", "Net Profit Margin (%)", "Debt to Equity (x)", "Current Ratio (x)"], "2023": [4.2, 2.8, 4.5, 0.35, 2.50], "2024": [5.1, 3.5, 5.2, 0.31, 2.70], "2025 Q1": [5.8, 4.1, 6.2, 0.28, 2.85], "Status": ["Weak", "Moderate", "Moderate", "Excellent", "Excellent"]})
         }
     }
+    return db.get(symbol, db["ADVANC"])
 
 # ==========================================
-# 4. DYNAMIC CALCULATION ENGINE (KOS 1.0)
+# 5. DYNAMIC CALCULATION ENGINE (KOS 1.0)
 # ==========================================
 def calculate_stock_metrics(stock_data):
     f = stock_data["financials"]
@@ -263,10 +271,8 @@ def calculate_stock_metrics(stock_data):
     }
 
 # ==========================================
-# 5. SIDEBAR & APP CONTROLS
+# 6. SIDEBAR & APP CONTROLS
 # ==========================================
-raw_db = get_raw_financial_db()
-
 with st.sidebar:
     st.title("🧠 AI Investment System")
     st.caption("Financial Analysis Engine v1.0")
@@ -285,7 +291,7 @@ with st.sidebar:
         " Industry Benchmark"
     ])
 
-stock_raw = raw_db[selected_symbol]
+stock_raw = get_stock_data_from_backend(selected_symbol)
 calc = calculate_stock_metrics(stock_raw)
 
 # Header Bar
@@ -303,7 +309,7 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 6. TAB 1: OVERVIEW DASHBOARD
+# 7. TAB 1: OVERVIEW DASHBOARD
 # ==========================================
 if "Overview" in selected_tab:
     st.markdown("<h2 style='color:#0F172A;'>OVERVIEW DASHBOARD</h2>", unsafe_allow_html=True)
@@ -414,7 +420,7 @@ if "Overview" in selected_tab:
             st.markdown(f"🏆 <span class='metric-label'>Industry Rank</span><div class='metric-value' style='color:#0891B2;'>{fin['Rank']}</div><span class='metric-label'>In Sector</span>", unsafe_allow_html=True)
 
 # ==========================================
-# 7. TAB 2: COMPANY HEALTH
+# 8. TAB 2: COMPANY HEALTH
 # ==========================================
 elif "Company Health" in selected_tab:
     st.markdown(f"<h2 style='color:#0F172A;'>COMPANY HEALTH ANALYSIS ({selected_symbol})</h2>", unsafe_allow_html=True)
@@ -447,7 +453,7 @@ elif "Company Health" in selected_tab:
     st.dataframe(stock_raw["history_table"], use_container_width=True, hide_index=True)
 
 # ==========================================
-# 8. TAB 3: FAIR VALUE ASSESSMENT
+# 9. TAB 3: FAIR VALUE ASSESSMENT
 # ==========================================
 elif "Fair Value" in selected_tab:
     st.markdown(f"<h2 style='color:#0F172A;'>FAIR VALUE ASSESSMENT ({selected_symbol})</h2>", unsafe_allow_html=True)
