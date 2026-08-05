@@ -25,7 +25,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS จัดระเบียบหน้าจอ ธีมสว่าง Modern Clean Light สไตล์สถาบันการเงิน
+# Custom CSS จัดระเบียบหน้าจอ ธีมสว่าง Modern Clean Light
 st.markdown("""
     <style>
     .stApp, [data-testid="stSidebar"], [data-testid="stHeader"] {
@@ -138,67 +138,62 @@ def create_stock_price_chart(dates, prices, color="#16A34A"):
     return fig
 
 # ==========================================
-# 4. SMART DATA FETCHING ENGINE (API / BACKEND READY)
+# 4. ANNUAL FINANCIAL DATASTORE (FULL YEAR)
 # ==========================================
 stock_list = ["ADVANC", "CCET", "DELTA", "HANA", "JMART", "KCE", "TRUE", "THCOM"]
 
 @st.cache_data
 def get_stock_data_from_backend(symbol):
-    """
-    ฟังก์ชันอัจฉริยะ: ดึงข้อมูลแยกรายหุ้น 
-    (หากมี API Key หรือไฟล์ CSV ในอนาคต สามารถสลับมาอ่านไฟล์จริงได้ทันที)
-    """
-    dates = ["Nov 2024", "Dec 2024", "Jan 2025", "Feb 2025", "Mar 2025", "May 2025"]
+    dates = ["2020", "2021", "2022", "2023", "2024", "2025"]
     
-    # ฐานข้อมูลเฉพาะของแต่ละหุ้น (แม่นยำ แยกรายตัว)
     db = {
         "ADVANC": {
             "name": "Advanced Info Service PCL", "price": 285.00, "change_str": "+2.00 (+0.71%)", "mcap": "847,700 MB", "pe": 25.4, "pb": 8.2, "div": 3.85, "sector": "Technology", "industry": "Telecommunication", "eps": 11.22,
-            "dates": dates, "prices_hist": [245, 252, 260, 272, 280, 285],
-            "financials": {"ROE": 28.5, "ROA": 14.2, "NPM": 22.1, "DE": 1.25, "CR": 0.95, "OCF_NI": 1.25, "RevGrowth": 6.2, "NetGrowth": 9.5, "FCF": "42,100 MB", "Rank": "TOP 2"},
-            "history_table": pd.DataFrame({"Metric": ["ROE (%)", "ROA (%)", "Net Profit Margin (%)", "Debt to Equity (x)", "Current Ratio (x)"], "2023": [24.1, 12.1, 19.5, 1.45, 0.82], "2024": [26.2, 13.2, 20.8, 1.32, 0.88], "2025 Q1": [28.5, 14.2, 22.1, 1.25, 0.95], "Status": ["Excellent", "Excellent", "Excellent", "Good", "Moderate"]})
+            "dates": dates, "prices_hist": [180, 210, 225, 245, 265, 285],
+            "financials": {"ROE": 26.2, "ROA": 13.2, "NPM": 20.8, "DE": 1.32, "CR": 0.88, "OCF_NI": 1.25, "RevGrowth": 6.2, "NetGrowth": 9.5, "FCF": "42,100 MB", "Rank": "TOP 2"},
+            "history_table": pd.DataFrame({"Metric": ["ROE (%)", "ROA (%)", "Net Profit Margin (%)", "Debt to Equity (x)", "Current Ratio (x)"], "2022 (FY)": [22.5, 11.2, 18.2, 1.55, 0.75], "2023 (FY)": [24.1, 12.1, 19.5, 1.45, 0.82], "2024 (FY)": [26.2, 13.2, 20.8, 1.32, 0.88], "Status": ["Excellent", "Excellent", "Excellent", "Good", "Moderate"]})
         },
         "DELTA": {
             "name": "Delta Electronics (Thailand) PCL", "price": 160.00, "change_str": "+3.50 (+2.23%)", "mcap": "1,996,000 MB", "pe": 65.3, "pb": 18.2, "div": 0.85, "sector": "Technology", "industry": "Electronic Components", "eps": 2.45,
-            "dates": dates, "prices_hist": [120, 132, 145, 150, 155, 160],
-            "financials": {"ROE": 32.1, "ROA": 21.5, "NPM": 16.8, "DE": 0.42, "CR": 1.85, "OCF_NI": 1.12, "RevGrowth": 22.0, "NetGrowth": 28.4, "FCF": "18,500 MB", "Rank": "TOP 1"},
-            "history_table": pd.DataFrame({"Metric": ["ROE (%)", "ROA (%)", "Net Profit Margin (%)", "Debt to Equity (x)", "Current Ratio (x)"], "2023": [26.2, 18.2, 14.1, 0.55, 1.65], "2024": [29.5, 19.8, 15.5, 0.48, 1.75], "2025 Q1": [32.1, 21.5, 16.8, 0.42, 1.85], "Status": ["Excellent", "Excellent", "Excellent", "Excellent", "Excellent"]})
+            "dates": dates, "prices_hist": [40, 65, 95, 120, 145, 160],
+            "financials": {"ROE": 29.5, "ROA": 19.8, "NPM": 15.5, "DE": 0.48, "CR": 1.75, "OCF_NI": 1.12, "RevGrowth": 22.0, "NetGrowth": 28.4, "FCF": "18,500 MB", "Rank": "TOP 1"},
+            "history_table": pd.DataFrame({"Metric": ["ROE (%)", "ROA (%)", "Net Profit Margin (%)", "Debt to Equity (x)", "Current Ratio (x)"], "2022 (FY)": [24.0, 16.5, 12.8, 0.62, 1.55], "2023 (FY)": [26.2, 18.2, 14.1, 0.55, 1.65], "2024 (FY)": [29.5, 19.8, 15.5, 0.48, 1.75], "Status": ["Excellent", "Excellent", "Excellent", "Excellent", "Excellent"]})
         },
         "CCET": {
             "name": "Cal-Comp Electronics (Thailand) PCL", "price": 4.20, "change_str": "+0.10 (+2.44%)", "mcap": "43,800 MB", "pe": 12.0, "pb": 1.65, "div": 2.80, "sector": "Technology", "industry": "Electronic Components", "eps": 0.35,
-            "dates": dates, "prices_hist": [2.8, 3.1, 3.4, 3.7, 4.0, 4.2],
-            "financials": {"ROE": 14.2, "ROA": 6.1, "NPM": 4.5, "DE": 1.65, "CR": 1.15, "OCF_NI": 0.95, "RevGrowth": 18.5, "NetGrowth": 25.0, "FCF": "2,400 MB", "Rank": "TOP 4"},
-            "history_table": pd.DataFrame({"Metric": ["ROE (%)", "ROA (%)", "Net Profit Margin (%)", "Debt to Equity (x)", "Current Ratio (x)"], "2023": [10.5, 4.2, 3.2, 1.85, 1.02], "2024": [12.8, 5.1, 3.8, 1.72, 1.08], "2025 Q1": [14.2, 6.1, 4.5, 1.65, 1.15], "Status": ["Good", "Moderate", "Moderate", "Moderate", "Good"]})
+            "dates": dates, "prices_hist": [1.8, 2.2, 2.6, 3.0, 3.6, 4.2],
+            "financials": {"ROE": 12.8, "ROA": 5.1, "NPM": 3.8, "DE": 1.72, "CR": 1.08, "OCF_NI": 0.95, "RevGrowth": 18.5, "NetGrowth": 25.0, "FCF": "2,400 MB", "Rank": "TOP 4"},
+            "history_table": pd.DataFrame({"Metric": ["ROE (%)", "ROA (%)", "Net Profit Margin (%)", "Debt to Equity (x)", "Current Ratio (x)"], "2022 (FY)": [8.2, 3.5, 2.5, 1.95, 0.98], "2023 (FY)": [10.5, 4.2, 3.2, 1.85, 1.02], "2024 (FY)": [12.8, 5.1, 3.8, 1.72, 1.08], "Status": ["Good", "Moderate", "Moderate", "Moderate", "Good"]})
         },
         "HANA": {
             "name": "Hana Microelectronics PCL", "price": 38.50, "change_str": "-0.50 (-1.28%)", "mcap": "30,900 MB", "pe": 17.9, "pb": 1.25, "div": 4.20, "sector": "Technology", "industry": "Electronic Components", "eps": 2.15,
-            "dates": dates, "prices_hist": [44, 42, 41, 39, 38, 38.5],
-            "financials": {"ROE": 11.2, "ROA": 7.5, "NPM": 8.2, "DE": 0.35, "CR": 2.15, "OCF_NI": 1.35, "RevGrowth": -2.5, "NetGrowth": -8.4, "FCF": "3,100 MB", "Rank": "TOP 5"},
-            "history_table": pd.DataFrame({"Metric": ["ROE (%)", "ROA (%)", "Net Profit Margin (%)", "Debt to Equity (x)", "Current Ratio (x)"], "2023": [14.5, 9.2, 10.1, 0.42, 2.05], "2024": [12.1, 8.0, 8.9, 0.38, 2.10], "2025 Q1": [11.2, 7.5, 8.2, 0.35, 2.15], "Status": ["Moderate", "Good", "Good", "Excellent", "Excellent"]})
+            "dates": dates, "prices_hist": [55, 60, 52, 45, 40, 38.5],
+            "financials": {"ROE": 12.1, "ROA": 8.0, "NPM": 8.9, "DE": 0.38, "CR": 2.10, "OCF_NI": 1.35, "RevGrowth": -2.5, "NetGrowth": -8.4, "FCF": "3,100 MB", "Rank": "TOP 5"},
+            "history_table": pd.DataFrame({"Metric": ["ROE (%)", "ROA (%)", "Net Profit Margin (%)", "Debt to Equity (x)", "Current Ratio (x)"], "2022 (FY)": [16.2, 10.5, 11.5, 0.45, 1.98], "2023 (FY)": [14.5, 9.2, 10.1, 0.42, 2.05], "2024 (FY)": [12.1, 8.0, 8.9, 0.38, 2.10], "Status": ["Moderate", "Good", "Good", "Excellent", "Excellent"]})
         },
         "JMART": {
             "name": "Jaymart Group Holdings PCL", "price": 14.20, "change_str": "-0.20 (-1.39%)", "mcap": "20,700 MB", "pe": 24.5, "pb": 1.85, "div": 1.50, "sector": "Commerce", "industry": "Technology Retail", "eps": 0.58,
-            "dates": dates, "prices_hist": [20, 18, 16, 15, 14, 14.2],
-            "financials": {"ROE": 7.8, "ROA": 3.8, "NPM": 4.1, "DE": 2.15, "CR": 1.05, "OCF_NI": 0.82, "RevGrowth": 4.2, "NetGrowth": 12.1, "FCF": "850 MB", "Rank": "TOP 7"},
-            "history_table": pd.DataFrame({"Metric": ["ROE (%)", "ROA (%)", "Net Profit Margin (%)", "Debt to Equity (x)", "Current Ratio (x)"], "2023": [-5.2, -2.1, -3.5, 2.45, 0.92], "2024": [5.1, 2.5, 2.8, 2.25, 0.98], "2025 Q1": [7.8, 3.8, 4.1, 2.15, 1.05], "Status": ["Weak", "Weak", "Weak", "Weak", "Moderate"]})
+            "dates": dates, "prices_hist": [35, 45, 30, 20, 16, 14.2],
+            "financials": {"ROE": 5.1, "ROA": 2.5, "NPM": 2.8, "DE": 2.25, "CR": 0.98, "OCF_NI": 0.82, "RevGrowth": 4.2, "NetGrowth": 12.1, "FCF": "850 MB", "Rank": "TOP 7"},
+            "history_table": pd.DataFrame({"Metric": ["ROE (%)", "ROA (%)", "Net Profit Margin (%)", "Debt to Equity (x)", "Current Ratio (x)"], "2022 (FY)": [18.5, 8.2, 9.1, 1.85, 1.15], "2023 (FY)": [-5.2, -2.1, -3.5, 2.45, 0.92], "2024 (FY)": [5.1, 2.5, 2.8, 2.25, 0.98], "Status": ["Weak", "Weak", "Weak", "Weak", "Moderate"]})
         },
         "KCE": {
             "name": "KCE Electronics PCL", "price": 41.00, "change_str": "+0.50 (+1.23%)", "mcap": "48,400 MB", "pe": 19.3, "pb": 2.85, "div": 3.40, "sector": "Technology", "industry": "Electronic Components", "eps": 2.12,
-            "dates": dates, "prices_hist": [50, 47, 44, 42, 40, 41],
-            "financials": {"ROE": 15.8, "ROA": 10.2, "NPM": 11.5, "DE": 0.58, "CR": 1.75, "OCF_NI": 1.18, "RevGrowth": 3.5, "NetGrowth": 5.2, "FCF": "4,200 MB", "Rank": "TOP 3"},
-            "history_table": pd.DataFrame({"Metric": ["ROE (%)", "ROA (%)", "Net Profit Margin (%)", "Debt to Equity (x)", "Current Ratio (x)"], "2023": [18.2, 11.8, 12.8, 0.68, 1.55], "2024": [16.5, 10.8, 11.9, 0.62, 1.65], "2025 Q1": [15.8, 10.2, 11.5, 0.58, 1.75], "Status": ["Good", "Good", "Good", "Excellent", "Excellent"]})
+            "dates": dates, "prices_hist": [60, 75, 55, 48, 43, 41],
+            "financials": {"ROE": 16.5, "ROA": 10.8, "NPM": 11.9, "DE": 0.62, "CR": 1.65, "OCF_NI": 1.18, "RevGrowth": 3.5, "NetGrowth": 5.2, "FCF": "4,200 MB", "Rank": "TOP 3"},
+            "history_table": pd.DataFrame({"Metric": ["ROE (%)", "ROA (%)", "Net Profit Margin (%)", "Debt to Equity (x)", "Current Ratio (x)"], "2022 (FY)": [20.1, 13.2, 14.2, 0.72, 1.45], "2023 (FY)": [18.2, 11.8, 12.8, 0.68, 1.55], "2024 (FY)": [16.5, 10.8, 11.9, 0.62, 1.65], "Status": ["Good", "Good", "Good", "Excellent", "Excellent"]})
         },
         "TRUE": {
             "name": "True Corporation PCL", "price": 11.80, "change_str": "+0.30 (+2.61%)", "mcap": "407,700 MB", "pe": 53.6, "pb": 3.12, "div": 1.20, "sector": "Technology", "industry": "Telecommunication", "eps": 0.22,
-            "dates": dates, "prices_hist": [7.0, 8.2, 9.5, 10.2, 11.0, 11.8],
-            "financials": {"ROE": 4.2, "ROA": 1.8, "NPM": 2.1, "DE": 3.85, "CR": 0.62, "OCF_NI": 2.85, "RevGrowth": 5.1, "NetGrowth": 110.0, "FCF": "18,200 MB", "Rank": "TOP 6"},
-            "history_table": pd.DataFrame({"Metric": ["ROE (%)", "ROA (%)", "Net Profit Margin (%)", "Debt to Equity (x)", "Current Ratio (x)"], "2023": [-8.5, -2.8, -5.2, 4.50, 0.51], "2024": [1.2, 0.5, 0.8, 4.10, 0.58], "2025 Q1": [4.2, 1.8, 2.1, 3.85, 0.62], "Status": ["Weak", "Weak", "Weak", "Weak", "Weak"]})
+            "dates": dates, "prices_hist": [4.5, 5.0, 5.8, 7.2, 9.5, 11.8],
+            "financials": {"ROE": 1.2, "ROA": 0.5, "NPM": 0.8, "DE": 4.10, "CR": 0.58, "OCF_NI": 2.85, "RevGrowth": 5.1, "NetGrowth": 110.0, "FCF": "18,200 MB", "Rank": "TOP 6"},
+            "history_table": pd.DataFrame({"Metric": ["ROE (%)", "ROA (%)", "Net Profit Margin (%)", "Debt to Equity (x)", "Current Ratio (x)"], "2022 (FY)": [-12.1, -4.2, -8.5, 4.80, 0.45], "2023 (FY)": [-8.5, -2.8, -5.2, 4.50, 0.51], "2024 (FY)": [1.2, 0.5, 0.8, 4.10, 0.58], "Status": ["Weak", "Weak", "Weak", "Weak", "Weak"]})
         },
         "THCOM": {
             "name": "Thaicom PCL", "price": 12.50, "change_str": "+0.10 (+0.81%)", "mcap": "13,700 MB", "pe": 27.7, "pb": 0.92, "div": 2.40, "sector": "Technology", "industry": "Telecommunication", "eps": 0.45,
-            "dates": dates, "prices_hist": [14.0, 13.5, 13.0, 12.4, 12.2, 12.5],
-            "financials": {"ROE": 5.8, "ROA": 4.1, "NPM": 6.2, "DE": 0.28, "CR": 2.85, "OCF_NI": 1.45, "RevGrowth": -1.2, "NetGrowth": 15.2, "FCF": "1,250 MB", "Rank": "TOP 8"},
-            "history_table": pd.DataFrame({"Metric": ["ROE (%)", "ROA (%)", "Net Profit Margin (%)", "Debt to Equity (x)", "Current Ratio (x)"], "2023": [4.2, 2.8, 4.5, 0.35, 2.50], "2024": [5.1, 3.5, 5.2, 0.31, 2.70], "2025 Q1": [5.8, 4.1, 6.2, 0.28, 2.85], "Status": ["Weak", "Moderate", "Moderate", "Excellent", "Excellent"]})
+            "dates": dates, "prices_hist": [9.0, 10.5, 15.0, 13.5, 12.2, 12.5],
+            "financials": {"ROE": 5.1, "ROA": 3.5, "NPM": 5.2, "DE": 0.31, "CR": 2.70, "OCF_NI": 1.45, "RevGrowth": -1.2, "NetGrowth": 15.2, "FCF": "1,250 MB", "Rank": "TOP 8"},
+            "history_table": pd.DataFrame({"Metric": ["ROE (%)", "ROA (%)", "Net Profit Margin (%)", "Debt to Equity (x)", "Current Ratio (x)"], "2022 (FY)": [3.5, 2.1, 3.8, 0.38, 2.30], "2023 (FY)": [4.2, 2.8, 4.5, 0.35, 2.50], "2024 (FY)": [5.1, 3.5, 5.2, 0.31, 2.70], "Status": ["Weak", "Moderate", "Moderate", "Excellent", "Excellent"]})
         }
     }
     return db.get(symbol, db["ADVANC"])
@@ -325,7 +320,7 @@ if "Overview" in selected_tab:
                 <div style='font-size:11px; color:#64748B; margin-bottom:8px;'>{stock_raw['name']}</div>
                 <div style='font-size:24px; font-weight:bold; color:#0F172A;'>{stock_raw['price']:.2f} <span style='font-size:12px;'>THB</span></div>
                 <div style='color:#16A34A; font-size:11px;'>{stock_raw['change_str']}</div>
-                <div style='font-size:9px; color:#64748B; margin-top:2px; margin-bottom:8px;'>Market Closed | 23 May 2025</div>
+                <div style='font-size:9px; color:#64748B; margin-top:2px; margin-bottom:8px;'>Annual Analysis (FY2024)</div>
             """, unsafe_allow_html=True)
             
             fig_stock = create_stock_price_chart(stock_raw["dates"], stock_raw["prices_hist"])
@@ -436,7 +431,7 @@ elif "Company Health" in selected_tab:
     with col2:
         with st.container(border=True):
             st.markdown("<h5 style='color:#0F172A;'>💡 EXPLAINABLE AI REASONING</h5>", unsafe_allow_html=True)
-            st.write(f"จากการประมวลผลงบการเงิน: บริษัท {selected_symbol} มีคะแนน ROE เท่ากับ {stock_raw['financials']['ROE']}% และมีภาระหนี้สิน D/E เท่ากับ {stock_raw['financials']['DE']}x ส่งผลให้ระดับเสถียรภาพทางการเงินอยู่ในเกณฑ์สอดคล้องกับมาตรฐาน KOS 1.0")
+            st.write(f"จากการประมวลผลงบการเงินเต็มปี (Full Year): บริษัท {selected_symbol} มีคะแนน ROE เท่ากับ {stock_raw['financials']['ROE']}% และมีภาระหนี้สิน D/E เท่ากับ {stock_raw['financials']['DE']}x ส่งผลให้ระดับเสถียรภาพทางการเงินอยู่ในเกณฑ์สอดคล้องกับมาตรฐาน KOS 1.0")
 
     st.markdown("<h5 style='color:#0F172A; margin-top:15px;'>7 DIMENSIONS SCORE BREAKDOWN</h5>", unsafe_allow_html=True)
     dim_cols = st.columns(7)
@@ -449,7 +444,7 @@ elif "Company Health" in selected_tab:
                 st.markdown(f"<div style='text-align:center; margin-top:2px;'><span class='badge-excellent'>W: {dim['w']}</span></div>", unsafe_allow_html=True)
 
     st.divider()
-    st.markdown("<h5 style='color:#0F172A;'>📋 FINANCIAL STATEMENT HISTORY & RATIOS</h5>", unsafe_allow_html=True)
+    st.markdown("<h5 style='color:#0F172A;'>📋 FINANCIAL STATEMENT HISTORY & RATIOS (FULL YEAR)</h5>", unsafe_allow_html=True)
     st.dataframe(stock_raw["history_table"], use_container_width=True, hide_index=True)
 
 # ==========================================
